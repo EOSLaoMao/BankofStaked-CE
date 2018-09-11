@@ -21,10 +21,10 @@ The main logic of Bank of Staked are formed by these three tables:
 Plan table holds all avialible plans user can choose, fields are:
 
 ```
-price     asset; //plan price
-cpu     asset; // delegated cpu this plan offers.
-net     asset; // delegated net this plan offers.
-duration      unit64; //the period of time service gonna last, in minutes.
+price			asset; //plan price
+cpu			asset; // delegated cpu this plan offers.
+net			asset; // delegated net this plan offers.
+duration			unit64; //the period of time service gonna last, in minutes.
 is_free			uint64; //free plan or not, if is_free is 1, order will be auto refunded.
 ...
 ```
@@ -34,8 +34,8 @@ is_free			uint64; //free plan or not, if is_free is 1, order will be auto refund
 `Creditors` are the real ones do delegate and undelegate. When a valid transfer happens, the contract will try to find `is_active` creditor to do auto delegation.
 
 ```
-account     account_name;
-is_active     uint64;
+account			account_name;
+is_active			uint64;
 ...
 ```
 
@@ -48,12 +48,12 @@ in production, you should always have creditors shifting like 3 days in a roll, 
 Order table consists of records of active orders, by active, we mean these orders are not expired.
 
 ```
-buyer     account_name;
-creditor      account_name;
-beneficiary     account_name;
-cpu_staked      asset;
-net_staked      asset;
-expire_at     uint64;
+buyer			account_name;
+creditor			account_name;
+beneficiary			account_name;
+cpu_staked			asset;
+net_staked			asset;
+expire_at			uint64;
 ...
 ```
 
