@@ -361,6 +361,19 @@ private:
         out.actions.emplace_back(act3);
       }
       */
+
+      //if order is_free is not free, transfer income to creditor
+      if (order.is_free == FALSE)
+      {
+        auto plan = p.get(order.plan_id);
+        std:string memo = "bankofstaked income";
+        action act3 = action(
+          permission_level{ code_account, N(active) },
+          N(eosio.token), N(transfer),
+          std::make_tuple(code_account, order.creditor, order.price, memo)
+        );
+        out.actions.emplace_back(act3);
+      }
     }
 
     if(duration > 0) {
