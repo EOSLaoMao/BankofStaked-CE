@@ -8,17 +8,17 @@ BankofStaked: CPU&NET leasing Smart Contract
 
 
 ### About
-Bank of Staked is an EOS smart contract aiming to provide cheap CPU and NET lease to both EOS users and EOS developers. This contract is build by `EOSLaoMao Team`.
+Bank of Staked is an EOS smart contract aiming to provide cheap CPU&NET lease to both EOS users and developers. This contract is build by `EOSLaoMao Team`.
 
 ### Design
 
-The UX Bank of Staked wants to achieve is that user can simply transfer certain amount of EOS, then they can get delegetad resource automatically. And the undelegate process is also trigged automatically.
+The UX Bank of Staked wants to achieve is that any account could get CPU&NET delegated automatically through a simple transfer, no more action needed. And the undelegate process will also be triggered automatically.
 
-The main logic of Bank of Staked are formed by these three tables:
+The main logic of Bank of Staked are realized through these three tables:
 
 #### 1. Plan Table
 
-Plan table holds all avialible plans user can choose, fields are:
+Plan table holds all avialible plans user can choose, main fields are:
 
 ```
 price			asset; //plan price
@@ -31,7 +31,7 @@ is_free			uint64; //free plan or not, if is_free is 1, order will be auto refund
 
 #### 2. Creditor Table
 
-`Creditors` are the real ones do delegate and undelegate. When a valid transfer happens, the contract will try to find `is_active` creditor to do auto delegation.
+`Creditors` are the real ones who delegate&undelegate. When a valid transfer happens, the contract will try to find `is_active` creditor to do an auto delegation using that creditor account.
 
 ```
 account			account_name;
@@ -45,7 +45,7 @@ in production, you should always have creditors shifting like 3 days in a roll, 
 
 #### 3. Order Table
 
-Order table consists of records of active orders, by active, we mean these orders are not expired.
+Order table consists of active order records, by active, we mean these orders are not expired.
 
 ```
 buyer				account_name;
@@ -70,11 +70,11 @@ expire_at			uint64;
 
 There are also several other tables facilitating this contract. such as,
 
-`freelock` table is used to lock free plan for each account for 24 hours.
+`freelock` table, used to lock free plan for each account for 24 hours.
 
-`history` table is used to store meta data of deleted expired order.
+`history` table, used to store meta data of deleted expired order.
 
-`blacklist` is used to blacklist certain account from using `bankofstaked` contract.
+`blacklist`, used to blacklist certain account from using `bankofstaked` contract.
 
 
 ![Process](./Order-Process-of-BankofStaked.svg)
@@ -91,7 +91,7 @@ https://www.myeoskit.com/#/tx/bankofstaked
 
 #### 1.Check available price plan
 
-Query `plan` table to get available plan:
+Query `plan` table to get available plans:
 
 
 ```
@@ -115,9 +115,9 @@ cleos -u https://api1.eosasia.one get table bankofstaked bankofstaked plan
 
 `price` indicates the EOS you should transfer to `bankofstaked` to get certain `cpu` and `net` for `duration` minutes.
 
-`is_free` means if you can get a refund immediately!!
+`is_free` means if you can get a refund or not(is refund applied, it will happend immediately!!)
 
-Currently we only provide 1 FREE plan: `0.1 EOS` for `60 min of 1 EOS CPU` staked.
+Currently we only provide 1 FREE plan: `0.1 EOS` for `60 min of 1 EOS CPU` staked, you will get a 0.1 EOS refund immediately after you transfer.
 
 Will add more plans ASAP.
 
@@ -141,7 +141,7 @@ After transfering token, you will be delegated `1 EOS of CPU` to you , after 60 
 
 ---
 
-if you want to contribute your EOS to creditor fund(only delegate, no transfer needed), please contact us at: contact@eoslaomao.com
+if you want to contribute your EOS to creditor fund(only delegate, no transfer needed), or if you are a BP who are willing to help users and developers, please contact us at: contact@eoslaomao.com
 
 built with love by EOSLaoMao Team. :)
 
