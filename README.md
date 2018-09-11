@@ -144,3 +144,5 @@ After transfering token, you will be delegated `1 EOS of CPU` to you , after 60 
 if you want to contribute your EOS to creditor fund(only delegate, no transfer needed), please contact us at: contact@eoslaomao.com
 
 built with love by EOSLaoMao Team. :)
+
+Icon made by Freepik from www.flaticon.com, special thanks~
