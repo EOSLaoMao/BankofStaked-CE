@@ -24,7 +24,7 @@ Plan table holds all avialible plans user can choose, fields are:
 price			asset; //plan price
 cpu			asset; // delegated cpu this plan offers.
 net			asset; // delegated net this plan offers.
-duration			unit64; //the period of time service gonna last, in minutes.
+duration		unit64; //the period of time service gonna last, in minutes.
 is_free			uint64; //free plan or not, if is_free is 1, order will be auto refunded.
 ...
 ```
@@ -35,7 +35,7 @@ is_free			uint64; //free plan or not, if is_free is 1, order will be auto refund
 
 ```
 account			account_name;
-is_active			uint64;
+is_active		uint64;
 ...
 ```
 
@@ -48,7 +48,7 @@ in production, you should always have creditors shifting like 3 days in a roll, 
 Order table consists of records of active orders, by active, we mean these orders are not expired.
 
 ```
-buyer			account_name;
+buyer				account_name;
 creditor			account_name;
 beneficiary			account_name;
 cpu_staked			asset;
