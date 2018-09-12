@@ -6,7 +6,7 @@
 Bank of Staked
 </h1>
 <h2 align="center">
-self-serve CPU&NET leasing Smart Contract
+a self-serve CPU&NET Vending Machine
 </h2>
 
 
