@@ -3,9 +3,14 @@
 </p>
 
 <h1 align="center">
-BankofStaked: CPU&NET leasing Smart Contract
+Bank of Staked
 </h1>
+<h2 align="center">
+self-serve CPU&NET leasing Smart Contract
+</h2>
 
+
+<a href="./README-CN.md">中文版介绍</a>
 
 ### About
 Bank of Staked is an EOS smart contract aiming to provide cheap CPU&NET lease to both EOS users and developers. This contract is build by `EOSLaoMao Team`.
