@@ -2,13 +2,10 @@
   <img width="200" height="200" src="./BankofStaked-logo.png">
 </p>
 
-<h1 align="center">
-Bank of Staked
-</h1>
-<h2 align="center">
-a self-serve CPU&NET Vending Machine
-</h2>
-
+<div align="center">
+	<h1>Bank of Staked</h1>
+	<h2>a self-serve CPU&NET Vending Machine</h2>
+</div>
 
 <a href="./README-CN.md">中文版介绍</a>
 

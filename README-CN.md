@@ -2,13 +2,13 @@
   <img width="200" height="200" src="./BankofStaked-logo.png">
 </p>
 
-<h1 align="center">
-Bank of Staked
-</h1>
-<h2 align="center">
-CPU&NET 自助租赁合约
-</h2>
+<div align="center">
+	<h1>Bank of Staked<h1>
+	<h2>CPU&NET 自助租赁合约</h2>
+</div>
 
+
+<a href="./README.md">English Version</a>
 
 ### 关于
 BankofStaked 智能合约旨在向 EOS 用户和开发者提供便捷的 CPU 和 NET 资源租赁服务。
