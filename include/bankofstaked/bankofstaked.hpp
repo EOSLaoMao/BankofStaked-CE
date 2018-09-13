@@ -19,6 +19,7 @@ static const uint64_t TRUE = 1;
 static const uint64_t FALSE = 0;
 static const uint64_t CHECK_MAX_DEPTH = 3;
 static const uint64_t MAX_EOS_BALANCE = 500 * 10000; // 500 EOS at most
+static const uint64_t MIN_CREDITOR_BALANCE = 10 * 10000; // 10 EOS at least
 
 // To protect your table, you can specify different scope as random numbers
 static const uint64_t SCOPE_ORDER = 18429195173743;
@@ -110,7 +111,7 @@ struct creditor
 {
   account_name account;
   uint64_t is_active;
-  uint64_t for_free;         // default is FALSE, for free plan, when service expired, it will do an auto refund
+  uint64_t for_free;         // default is FALSE, for_free means if this creditor provide free staking or not
   asset balance;              // amount of EOS paied
   asset cpu_staked;              // amount of EOS paied
   asset net_staked;              // amount of EOS paied
@@ -121,12 +122,14 @@ struct creditor
 
   account_name primary_key() const { return account; }
   uint64_t get_is_active() const { return is_active; }
+  uint64_t get_updated_at() const { return updated_at; }
 
   EOSLIB_SERIALIZE(creditor, (account)(is_active)(for_free)(balance)(cpu_staked)(net_staked)(cpu_unstaked)(net_unstaked)(created_at)(updated_at));
 };
 
 typedef multi_index<N(creditor), creditor,
-                    indexed_by<N(is_active), const_mem_fun<creditor, uint64_t, &creditor::get_is_active>>>
+                    indexed_by<N(is_active), const_mem_fun<creditor, uint64_t, &creditor::get_is_active>>,
+                    indexed_by<N(updated_at), const_mem_fun<creditor, uint64_t, &creditor::get_updated_at>>>
     creditor_table;
 
 // @abi table blacklist i64

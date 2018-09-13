@@ -89,6 +89,7 @@ public:
     }
     undelegate(order_ids, 0);
     expire_freelock();
+    rotate_creditor();
   }
 
 
@@ -233,6 +234,10 @@ public:
       }
       else
       {
+        if(itr->is_active == FALSE)
+        {
+           continue;
+        }
         c.modify(itr, ram_payer, [&](auto &i) {
           i.is_active = FALSE;
           i.balance = get_balance(itr->account);
