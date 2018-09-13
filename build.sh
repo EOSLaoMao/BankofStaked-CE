@@ -10,10 +10,12 @@ fi
 
 docker exec $NAME-eos-dev eosiocpp -g /$NAME/$NAME.abi /$NAME/src/$NAME.cpp
 docker exec $NAME-eos-dev eosiocpp -o /$NAME/$NAME.wast /$NAME/src/$NAME.cpp
-docker cp ../$NAME nodeosd:/
+docker cp ../BankofStaked-CE/$NAME.abi nodeosd:/$NAME/
+docker cp ../BankofStaked-CE/$NAME.wasm nodeosd:/$NAME/
+docker cp ../BankofStaked-CE/$NAME.wast nodeosd:/$NAME/
 docker cp scripts nodeosd:/
 
-
+#run unit test
 if [ ! -d build ]; then
     mkdir build
     echo "Create build dir!!"
