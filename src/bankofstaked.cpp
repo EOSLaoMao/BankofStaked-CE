@@ -89,6 +89,7 @@ public:
     }
     undelegate(order_ids, 0);
     expire_freelock();
+    rotate_creditor();
   }
 
 
@@ -141,7 +142,7 @@ public:
 
 
   // @abi action addcreditor
-  void addcreditor(account_name account)
+  void addcreditor(account_name account, uint64_t for_free)
   {
     require_auth(code_account);
     creditor_table c(code_account, SCOPE_CREDITOR>>1);
@@ -150,6 +151,7 @@ public:
 
     c.emplace(ram_payer, [&](auto &i) {
       i.is_active = FALSE;
+      i.for_free = for_free?TRUE:FALSE;
       i.account = account;
       i.balance = get_balance(account);
       i.created_at = now();
@@ -218,6 +220,10 @@ public:
     while (itr != c.begin())
     {
       itr--;
+      if (itr->for_free != creditor.for_free)
+      {
+        continue;
+      }
 
       if(itr->account==creditor.account) {
         c.modify(itr, ram_payer, [&](auto &i) {
@@ -228,6 +234,10 @@ public:
       }
       else
       {
+        if(itr->is_active == FALSE)
+        {
+           continue;
+        }
         c.modify(itr, ram_payer, [&](auto &i) {
           i.is_active = FALSE;
           i.balance = get_balance(itr->account);
@@ -412,7 +422,7 @@ private:
       }
 
       //get creditor
-      account_name creditor = get_active_creditor();
+      account_name creditor = get_active_creditor(plan->is_free);
 
 
       //validate buyer
