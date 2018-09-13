@@ -1,6 +1,7 @@
 #!/bin/bash
 IMAGE=eoslaomao/eos-dev:1.2.3
 NAME=bankofstaked
+FOLDER=bankofstaked
 
 docker ps | grep $NAME-eos-dev
 if [ $? -ne 0 ]; then
@@ -10,10 +11,11 @@ fi
 
 docker exec $NAME-eos-dev eosiocpp -g /$NAME/$NAME.abi /$NAME/src/$NAME.cpp
 docker exec $NAME-eos-dev eosiocpp -o /$NAME/$NAME.wast /$NAME/src/$NAME.cpp
-docker cp ../BankofStaked-CE/$NAME.abi nodeosd:/$NAME/
-docker cp ../BankofStaked-CE/$NAME.wasm nodeosd:/$NAME/
-docker cp ../BankofStaked-CE/$NAME.wast nodeosd:/$NAME/
+docker cp ../$FOLDER/$NAME.abi nodeosd:/$NAME/
+docker cp ../$FOLDER/$NAME.wasm nodeosd:/$NAME/
+docker cp ../$FOLDER/$NAME.wast nodeosd:/$NAME/
 docker cp scripts nodeosd:/
+
 
 #run unit test
 if [ ! -d build ]; then
