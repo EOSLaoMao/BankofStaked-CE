@@ -16,13 +16,27 @@ namespace utils
   }
 
   //get active creditor from creditor table
-  account_name get_active_creditor()
+  account_name get_active_creditor(uint64_t for_free)
   {
     uint64_t active = TRUE;
     creditor_table c(code_account, SCOPE_CREDITOR>>1);
     auto idx = c.get_index<N(is_active)>();
-    auto creditor = idx.get(active);
-    return creditor.account;
+    auto itr = idx.begin();
+    account_name creditor;
+    while (itr != idx.end())
+    {
+      if(itr->is_active != TRUE)
+      {
+         continue;
+      }
+
+      if(itr->for_free == for_free) {
+        creditor = itr->account;
+        break;
+      }
+      itr++;
+    }
+    return creditor;
   }
 
   //get account EOS balance

@@ -110,6 +110,7 @@ struct creditor
 {
   account_name account;
   uint64_t is_active;
+  uint64_t for_free;         // default is FALSE, for free plan, when service expired, it will do an auto refund
   asset balance;              // amount of EOS paied
   asset cpu_staked;              // amount of EOS paied
   asset net_staked;              // amount of EOS paied
@@ -121,7 +122,7 @@ struct creditor
   account_name primary_key() const { return account; }
   uint64_t get_is_active() const { return is_active; }
 
-  EOSLIB_SERIALIZE(creditor, (account)(is_active)(balance)(cpu_staked)(net_staked)(cpu_unstaked)(net_unstaked)(created_at)(updated_at));
+  EOSLIB_SERIALIZE(creditor, (account)(is_active)(for_free)(balance)(cpu_staked)(net_staked)(cpu_unstaked)(net_unstaked)(created_at)(updated_at));
 };
 
 typedef multi_index<N(creditor), creditor,
