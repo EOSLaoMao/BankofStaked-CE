@@ -344,14 +344,14 @@ private:
 
       // undelegatebw action
       action act1 = action(
-        permission_level{ order.creditor, N(active) },
+        permission_level{ order.creditor, N(creditorperm) },
         N(eosio), N(undelegatebw),
         std::make_tuple(order.creditor, order.beneficiary, order.net_staked, order.cpu_staked)
       );
       out.actions.emplace_back(act1);
       //delete order entry
       action act2 = action(
-        permission_level{ code_account, N(active) },
+        permission_level{ code_account, N(bankperm) },
         code_account, N(expireorder),
         std::make_tuple(order_id)
       );
@@ -364,7 +364,7 @@ private:
         auto plan = p.get(order.plan_id);
         std:string memo = plan.is_free==TRUE?free_memo:lucky_memo;
         action act3 = action(
-          permission_level{ code_account, N(active) },
+          permission_level{ code_account, N(bankperm) },
           N(eosio.token), N(transfer),
           std::make_tuple(code_account, order.buyer, order.price, memo)
         );
@@ -378,7 +378,7 @@ private:
         auto plan = p.get(order.plan_id);
         std:string memo = "bankofstaked income";
         action act3 = action(
-          permission_level{ code_account, N(active) },
+          permission_level{ code_account, N(bankperm) },
           N(eosio.token), N(transfer),
           std::make_tuple(code_account, order.creditor, order.price, memo)
         );
@@ -439,11 +439,11 @@ private:
 
       //INLINE ACTION to delegate CPU&NET for beneficiary account
       INLINE_ACTION_SENDER(eosiosystem::system_contract, delegatebw)
-      (eosio, {{creditor, N(active)}}, {creditor, beneficiary, plan->net, plan->cpu, false});
+      (eosio, {{creditor, N(creditorperm)}}, {creditor, beneficiary, plan->net, plan->cpu, false});
 
       //INLINE ACTION to call check action of `bankofstaked`
       INLINE_ACTION_SENDER(bankofstaked, check)
-      (code_account, {{code_account, N(active)}}, {});
+      (code_account, {{code_account, N(bankperm)}}, {});
 
       // add cpu_staked&net_staked to creditor entry
       creditor_table c(code_account, SCOPE_CREDITOR>>1);
@@ -496,7 +496,7 @@ private:
         //INLINE ACTION to auto refund
         std::string free_memo = "a gift from EOSLaoMao team :)";
         INLINE_ACTION_SENDER(eosio::token, transfer)
-        (N(eosio.token), {{code_account, N(active)}}, {code_account, buyer, plan->price, free_memo});
+        (N(eosio.token), {{code_account, N(bankperm)}}, {code_account, buyer, plan->price, free_memo});
       }
 
       //deferred transaction to auto undelegate after expired

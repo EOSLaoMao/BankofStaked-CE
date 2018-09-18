@@ -11,6 +11,7 @@ fi
 
 docker exec $NAME-eos-dev eosiocpp -g /$NAME/$NAME.abi /$NAME/src/$NAME.cpp
 docker exec $NAME-eos-dev eosiocpp -o /$NAME/$NAME.wast /$NAME/src/$NAME.cpp
+docker exec nodeosd mkdir /$NAME
 docker cp ../$FOLDER/$NAME.abi nodeosd:/$NAME/
 docker cp ../$FOLDER/$NAME.wasm nodeosd:/$NAME/
 docker cp ../$FOLDER/$NAME.wast nodeosd:/$NAME/

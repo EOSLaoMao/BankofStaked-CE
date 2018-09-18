@@ -65,7 +65,7 @@ namespace utils
     {
       if(itr->for_free == TRUE)
       {
-        if(free_rotated == TRUE){continue;}
+        if(free_rotated == TRUE){itr++;continue;}
         if (itr->account != free_creditor)
         {
           idx.modify(itr, ram_payer, [&](auto &i) {
@@ -78,7 +78,7 @@ namespace utils
       }
       else
       {
-        if(paid_rotated == TRUE){continue;}
+        if(paid_rotated == TRUE){itr++;continue;}
         if (itr->account != paid_creditor)
         {
           idx.modify(itr, ram_payer, [&](auto &i) {
@@ -89,6 +89,7 @@ namespace utils
           paid_rotated = TRUE;
         }
       }
+      
     }
   }
 }
