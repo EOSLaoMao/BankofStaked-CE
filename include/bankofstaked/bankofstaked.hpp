@@ -113,6 +113,7 @@ struct creditor
   account_name account;
   uint64_t is_active;
   uint64_t for_free;         // default is FALSE, for_free means if this creditor provide free staking or not
+  string free_memo;    // memo for refund transaction
   asset balance;              // amount of EOS paied
   asset cpu_staked;              // amount of EOS paied
   asset net_staked;              // amount of EOS paied
@@ -125,7 +126,7 @@ struct creditor
   uint64_t get_is_active() const { return is_active; }
   uint64_t get_updated_at() const { return updated_at; }
 
-  EOSLIB_SERIALIZE(creditor, (account)(is_active)(for_free)(balance)(cpu_staked)(net_staked)(cpu_unstaked)(net_unstaked)(created_at)(updated_at));
+  EOSLIB_SERIALIZE(creditor, (account)(is_active)(for_free)(free_memo)(balance)(cpu_staked)(net_staked)(cpu_unstaked)(net_unstaked)(created_at)(updated_at));
 };
 
 typedef multi_index<N(creditor), creditor,

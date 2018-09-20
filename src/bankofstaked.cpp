@@ -150,7 +150,7 @@ public:
 
 
   // @abi action addcreditor
-  void addcreditor(account_name account, uint64_t for_free)
+  void addcreditor(account_name account, uint64_t for_free, std::string free_memo)
   {
     require_auth(code_account);
     creditor_table c(code_account, SCOPE_CREDITOR>>1);
@@ -160,6 +160,7 @@ public:
     c.emplace(ram_payer, [&](auto &i) {
       i.is_active = FALSE;
       i.for_free = for_free?TRUE:FALSE;
+      i.free_memo = for_free?free_memo:"";
       i.account = account;
       i.balance = get_balance(account);
       i.created_at = now();
@@ -363,10 +364,6 @@ private:
       nonce += order_id;
       // get order entry
       auto order = o.get(order_id);
-      //memo for free plan
-      std::string free_memo = "a gift from EOSLaoMao team :)";
-      //momo for lucky ones
-      std::string lucky_memo = "lucky you :) shut up and take your money!";
 
       // undelegatebw action
       action act1 = action(
@@ -494,7 +491,8 @@ private:
         add_freelock(beneficiary);
         // auto refund immediately
         //INLINE ACTION to auto refund
-        std::string free_memo = "a gift from EOSLaoMao team :)";
+        creditor_table c(code_account, SCOPE_CREDITOR>>1);
+        std::string free_memo = c.get(creditor).free_memo;
         INLINE_ACTION_SENDER(eosio::token, transfer)
         (N(eosio.token), {{code_account, N(bankperm)}}, {code_account, buyer, plan->price, free_memo});
       }
