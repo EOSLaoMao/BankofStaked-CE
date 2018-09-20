@@ -268,6 +268,7 @@ public:
         i.cpu = cpu;
         i.net = net;
         i.duration = duration;
+        i.is_active = FALSE;
         i.is_free = is_free?TRUE:FALSE;
         i.created_at = now();
         i.updated_at = now();
@@ -283,6 +284,22 @@ public:
         i.updated_at = now();
       });
     }
+  }
+  
+  // @abi action activateplan
+  void activateplan(asset price, bool is_active)
+  {
+    require_auth(code_account);
+    eosio_assert(price.is_valid(), "invalid price");
+    plan_table p(code_account, code_account);
+    auto idx = p.get_index<N(price)>();
+    auto itr = idx.find(price.amount);
+    eosio_assert(itr != idx.end(), "price not found");
+
+    idx.modify(itr, ram_payer, [&](auto &i) {
+     i.is_active = is_active?TRUE:FALSE;
+     i.updated_at = now();
+    });
   }
 
 
@@ -304,6 +321,7 @@ public:
       EOSIO_API(bankofstaked,
           (empty)
           (setplan)
+          (activateplan)
           (expireorder)
           (addcreditor)
           (delcreditor)
@@ -357,21 +375,6 @@ private:
       );
       out.actions.emplace_back(act2);
 
-      /*
-      //if order is_free is TRUE, refund to BUYER automaticially
-      if (order.is_free == TRUE)
-      {
-        auto plan = p.get(order.plan_id);
-        std:string memo = plan.is_free==TRUE?free_memo:lucky_memo;
-        action act3 = action(
-          permission_level{ code_account, N(bankperm) },
-          N(eosio.token), N(transfer),
-          std::make_tuple(code_account, order.buyer, order.price, memo)
-        );
-        out.actions.emplace_back(act3);
-      }
-      */
-
       //if order is_free is not free, transfer income to creditor
       if (order.is_free == FALSE)
       {
@@ -406,10 +409,11 @@ private:
       {
         return;
       }
-      //validate plan
+      //validate plan, is_active should be TRUE
       plan_table p(code_account, code_account);
       auto idx = p.get_index<N(price)>();
       auto plan = idx.find(t.quantity.amount);
+      eosio_assert(plan->is_active == TRUE, "plan is in-active");
       eosio_assert(plan != idx.end(), "invalid price");
 
       account_name beneficiary = get_beneficiary(t.memo, buyer);
@@ -454,18 +458,6 @@ private:
         i.balance = get_balance(creditor);
         i.updated_at = now();
       });
-
-      /*
-      //calculate order_is_free
-      //if plan->is_free, order will be free
-      //if current_time() % 3 is 0, order will be free. temporary disabled
-      //refund will be triggered after order expired automatically
-      uint64_t order_is_free = plan->is_free;
-      if(order_is_free == FALSE && current_time() % 3 == 0)
-      {
-        order_is_free = TRUE;
-      }
-      */
 
       uint64_t order_is_free = plan->is_free;
       //create Order entry

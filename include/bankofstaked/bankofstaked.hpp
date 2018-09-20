@@ -95,6 +95,7 @@ struct plan
   asset net;           // amount of EOS staked for net
   uint64_t duration;   // affective time, in minutes
   uint64_t is_free;    // default is FALSE, for free plan, when service expired, it will do a auto refund
+  uint64_t is_active;  // on active plan could be choosen
   uint64_t created_at; // unix time, in seconds
   uint64_t updated_at; // unix time, in seconds
 
