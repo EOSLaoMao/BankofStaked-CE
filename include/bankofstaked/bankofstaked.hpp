@@ -22,11 +22,11 @@ static const uint64_t MAX_EOS_BALANCE = 500 * 10000; // 500 EOS at most
 static const uint64_t MIN_CREDITOR_BALANCE = 10 * 10000; // 10 EOS at least
 
 // To protect your table, you can specify different scope as random numbers
-static const uint64_t SCOPE_ORDER = 18429195173743;
-static const uint64_t SCOPE_HISTORY = 18429195173743;
-static const uint64_t SCOPE_CREDITOR = 18429195173743;
-static const uint64_t SCOPE_FREELOCK = 18429195173743;
-static const uint64_t SCOPE_BLACKLIST = 18429195173743;
+static const uint64_t SCOPE_ORDER = 1842919517374;
+static const uint64_t SCOPE_HISTORY = 1842919517374;
+static const uint64_t SCOPE_CREDITOR = 1842919517374;
+static const uint64_t SCOPE_FREELOCK = 1842919517374;
+static const uint64_t SCOPE_BLACKLIST = 1842919517374;
 
 // @abi table freelock i64
 struct freelock

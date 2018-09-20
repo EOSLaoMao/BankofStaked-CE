@@ -96,13 +96,13 @@ class bankofstaked_tester : public tester
 
     fc::variant get_creditor(const account_name &act)
     {
-        vector<char> data = get_row_by_account(N(bankofstaked), 9214597586871, N(creditor), act);
+        vector<char> data = get_row_by_account(N(bankofstaked), 921459758687, N(creditor), act);
         return data.empty() ? EMPTY : abi_ser.binary_to_variant("creditor", data, abi_serializer_max_time);
     }
 
     fc::variant get_blacklist(const account_name &act)
     {
-        vector<char> data = get_row_by_account(N(bankofstaked), 9214597586871, N(blacklist), act);
+        vector<char> data = get_row_by_account(N(bankofstaked), 921459758687, N(blacklist), act);
         return data.empty() ? EMPTY : abi_ser.binary_to_variant("blacklist", data, abi_serializer_max_time);
     }
 
