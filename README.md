@@ -7,7 +7,8 @@
 	<h2>a self-serve CPU&NET Vending Machine</h2>
 </div>
 
-<a href="./README-CN.md">中文版介绍</a>
+<a href="./README-CN.md">中文版 README</a>
+<a href="./README-KR.md">한국의 README</a>
 
 ### About
 Bank of Staked is an EOS smart contract aiming to provide cheap CPU&NET lease to both EOS users and developers. This contract is build by `EOSLaoMao Team`.

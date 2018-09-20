@@ -7,7 +7,9 @@
 	<h2>a self-serve CPU&NET Vending Machine</h2>
 </div>
 
-<a href="./README-CN.md">中文版介绍</a>
+<a href="./README.md">English README</a>
+<a href="./README-CN.md">中文版 README</a>
+
 
 ### Bank of Staked 에 대해서
 뱅크 오브 스테이크 (Bank of Staked)는 EOS 사용자와 개발자 모두에게 값싼 CPU 및 NET 리스를 제공하기 위해 EOSLaoMao 팀이 작성한 EOS 스마트 컨트랙트입니다.

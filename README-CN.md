@@ -8,7 +8,8 @@
 </div>
 
 
-<a href="./README.md">English Version</a>
+<a href="./README.md">English README</a>
+<a href="./README-KR.md">한국의 README</a>
 
 ### 关于
 BankofStaked 智能合约旨在向 EOS 用户和开发者提供便捷的 CPU 和 NET 资源租赁服务。
