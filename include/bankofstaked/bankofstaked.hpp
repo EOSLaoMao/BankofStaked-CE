@@ -101,7 +101,7 @@ struct plan
 
   auto primary_key() const { return id; }
   uint64_t get_price() const { return (uint64_t)price.amount; }
-  EOSLIB_SERIALIZE(plan, (id)(price)(cpu)(net)(duration)(is_free)(created_at)(updated_at));
+  EOSLIB_SERIALIZE(plan, (id)(price)(cpu)(net)(duration)(is_free)(is_active)(created_at)(updated_at));
 };
 typedef multi_index<N(plan), plan,
                     indexed_by<N(price), const_mem_fun<plan, uint64_t, &plan::get_price>>>

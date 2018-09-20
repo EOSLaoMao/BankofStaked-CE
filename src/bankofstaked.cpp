@@ -27,6 +27,14 @@ public:
   void empty()
   {
     require_auth(code_account);
+    plan_table p(code_account, code_account);
+    while (p.begin() != p.end())
+    {
+      auto itr = p.end();
+      itr--;
+      p.erase(itr);
+      plan_table p(code_account, code_account);
+    }
     /*
     order_table o(code_account, SCOPE_ORDER>>1);
     while (o.begin() != o.end())
