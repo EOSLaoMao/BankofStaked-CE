@@ -27,6 +27,7 @@ public:
   void empty()
   {
     require_auth(code_account);
+    /*
     plan_table p(code_account, code_account);
     while (p.begin() != p.end())
     {
@@ -35,7 +36,6 @@ public:
       p.erase(itr);
       plan_table p(code_account, code_account);
     }
-    /*
     order_table o(code_account, SCOPE_ORDER>>1);
     while (o.begin() != o.end())
     {
@@ -176,10 +176,8 @@ public:
     creditor_table c(code_account, SCOPE_CREDITOR>>1);
     auto itr = c.find(account);
     eosio_assert(itr!= c.end(), "account not found in creditor table");
-    auto creditor = c.get(account);
-    eosio_assert(creditor.is_active == FALSE, "cannot delete active creditor");
-
-    //delelete
+    eosio_assert(itr->is_active == FALSE, "cannot delete active creditor");
+    //delelete creditor entry
     c.erase(itr);
   }
 
@@ -220,21 +218,21 @@ public:
     require_auth(code_account);
     creditor_table c(code_account, SCOPE_CREDITOR>>1);
 
+    auto creditor = c.find(account);
     //make sure specified creditor exists
-    eosio_assert(c.find(account) != c.end(), "account not found in blacklist table");
-    auto creditor = c.get(account);
+    eosio_assert(creditor != c.end(), "account not found in creditor table");
 
     //activate creditor, deactivate others
     auto itr = c.end();
     while (itr != c.begin())
     {
       itr--;
-      if (itr->for_free != creditor.for_free)
+      if (itr->for_free != creditor->for_free)
       {
         continue;
       }
 
-      if(itr->account==creditor.account) {
+      if(itr->account==creditor->account) {
         c.modify(itr, ram_payer, [&](auto &i) {
           i.is_active = TRUE;
           i.balance = get_balance(itr->account);
@@ -317,7 +315,7 @@ public:
   {
     if (action == N(transfer) and contract == N(eosio.token))
     {
-      received_token(unpack_action_data<currency::transfer>(), contract);
+      received_token(unpack_action_data<currency::transfer>());
       return;
     }
 
@@ -401,10 +399,11 @@ private:
   }
 
   //token received
-  void received_token(const currency::transfer &t, account_name code)
+  void received_token(const currency::transfer &t)
   {
     //validation token transfer, only accept EOS transfer
-    eosio_assert(t.quantity.symbol==symbol_type(system_token_symbol), "only accept EOS transfer");
+    //eosio_assert(t.quantity.symbol==symbol_type(system_token_symbol), "only accept EOS transfer");
+    eosio_assert(t.quantity.symbol==EOS_SYMBOL, "only accept EOS transfer");
 
     if (t.to == _self)
     {
@@ -464,7 +463,6 @@ private:
         i.updated_at = now();
       });
 
-      uint64_t order_is_free = plan->is_free;
       //create Order entry
       uint64_t order_id;
       order_table o(code_account, SCOPE_ORDER>>1);
@@ -477,7 +475,7 @@ private:
         i.plan_id = plan->id;
         i.cpu_staked = plan->cpu;
         i.net_staked = plan->net;
-        i.is_free = order_is_free;
+        i.is_free = plan->is_free;
         i.created_at = now();
         i.expire_at = now() + plan->duration * SECONDS_PER_MIN;
 

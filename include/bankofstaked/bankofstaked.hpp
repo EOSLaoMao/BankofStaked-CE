@@ -5,6 +5,8 @@
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/multi_index.hpp>
 
+#define EOS_SYMBOL S(4, EOS)
+
 using namespace eosio;
 
 namespace bank
