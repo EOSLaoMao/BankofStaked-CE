@@ -482,7 +482,6 @@ private:
         order_id = i.id;
       });
 
-
       // if plan is free, add a Freelock entry
       if(plan->is_free == TRUE)
       {

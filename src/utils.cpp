@@ -27,6 +27,7 @@ namespace utils
     {
       if(itr->is_active != TRUE)
       {
+         itr++;
          continue;
       }
 
