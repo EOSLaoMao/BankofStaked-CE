@@ -212,7 +212,7 @@ public:
     creditor_table c(code_account, SCOPE_CREDITOR>>1);
 
     //make sure specified creditor exists
-    eosio_assert(c.find(account) != c.end(), "account not found in blacklist table");
+    eosio_assert(c.find(account) != c.end(), "account not found in creditor table");
     auto creditor = c.get(account);
 
     //activate creditor, deactivate others
