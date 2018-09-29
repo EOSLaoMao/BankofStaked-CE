@@ -29,6 +29,7 @@ static const uint64_t SCOPE_HISTORY = 1842919517374;
 static const uint64_t SCOPE_CREDITOR = 1842919517374;
 static const uint64_t SCOPE_FREELOCK = 1842919517374;
 static const uint64_t SCOPE_BLACKLIST = 1842919517374;
+static const uint64_t SCOPE_WHITELIST = 1842919517374;
 
 // @abi table freelock i64
 struct freelock
@@ -146,4 +147,19 @@ struct blacklist
   EOSLIB_SERIALIZE(blacklist, (account)(created_at));
 };
 typedef multi_index<N(blacklist), blacklist> blacklist_table;
-} // namespace bank
+
+// @abi table whitelist i64
+struct whitelist
+{
+  account_name account;
+  uint64_t capacity; // max in-use free orders
+  uint64_t created_at; // unix time, in seconds
+
+  account_name primary_key() const { return account; }
+  EOSLIB_SERIALIZE(whitelist, (account)(capacity)(created_at));
+};
+typedef multi_index<N(whitelist), whitelist> whitelist_table;
+
+}// namespace bank
+
+
