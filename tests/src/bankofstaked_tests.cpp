@@ -106,6 +106,12 @@ class bankofstaked_tester : public tester
         return data.empty() ? EMPTY : abi_ser.binary_to_variant("blacklist", data, abi_serializer_max_time);
     }
 
+    fc::variant get_whitelist(const account_name &act)
+    {
+        vector<char> data = get_row_by_account(N(bankofstaked), 921459758687, N(whitelist), act);
+        return data.empty() ? EMPTY : abi_ser.binary_to_variant("whitelist", data, abi_serializer_max_time);
+    }
+
     fc::variant get_account(account_name acc, const string &symbolname)
     {
         auto symb = eosio::chain::symbol::from_string(symbolname);
@@ -316,5 +322,25 @@ try
     BOOST_REQUIRE_EQUAL(blacklist, "0");
 }
 FC_LOG_AND_RETHROW()
+
+
+// test action addwhitelist
+BOOST_FIXTURE_TEST_CASE(addwhitelist_test, bankofstaked_tester)
+try
+{
+    // add 2 whitelist account, alice/bob
+    push_action(N(bankofstaked), N(addwhitelist), mvo()("account", "alice")("capacity", 100), config::active_name);
+    push_action(N(bankofstaked), N(addwhitelist), mvo()("account", "bob")("capacity", 1000), config::active_name);
+
+    auto whitelist = get_whitelist("alice");
+    BOOST_REQUIRE_EQUAL(whitelist["account"], "alice");
+    BOOST_REQUIRE_EQUAL(whitelist["capacity"], 100);
+
+    whitelist = get_whitelist("bob");
+    BOOST_REQUIRE_EQUAL(whitelist["account"], "bob");
+    BOOST_REQUIRE_EQUAL(whitelist["capacity"], 1000);
+}
+FC_LOG_AND_RETHROW()
+
 
 BOOST_AUTO_TEST_SUITE_END()

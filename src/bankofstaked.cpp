@@ -148,6 +148,26 @@ public:
     });
   }
 
+  // @abi action addwhitelist
+  void addwhitelist(account_name account, uint64_t capacity)
+  {
+    require_auth(code_account);
+    whitelist_table w(code_account, SCOPE_WHITELIST>>1);
+    auto itr = w.find(account);
+    if(itr == w.end()) {
+      w.emplace(ram_payer, [&](auto &i) {
+        i.account = account;
+        i.capacity = capacity;
+        i.created_at = now();
+        i.updated_at = now();
+      });
+    } else {
+      w.modify(itr, ram_payer, [&](auto &i) {
+        i.capacity = capacity;
+        i.updated_at = now();
+      });
+    }
+  }
 
   // @abi action addcreditor
   void addcreditor(account_name account, uint64_t for_free, std::string free_memo)
@@ -330,6 +350,7 @@ public:
           (setplan)
           (activateplan)
           (expireorder)
+          (addwhitelist)
           (addcreditor)
           (delcreditor)
           (addblacklist)
