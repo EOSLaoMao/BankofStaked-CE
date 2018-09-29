@@ -21,11 +21,12 @@ namespace validation
     eosio_assert(itr == b.end(), "something wrong with your account");
   }
 
-  uint64_t get_max_orders(account_name creditor)
+  //get BUYER's order amount limit
+  uint64_t get_max_orders(account_name buyer)
   {
     uint64_t max_orders = MAX_PAID_ORDERS;
     whitelist_table w(code_account, SCOPE_WHITELIST>>1);
-    auto itr = w.find(creditor);
+    auto itr = w.find(buyer);
     if(itr != w.end())
     {
        max_orders = itr->capacity;
@@ -33,7 +34,7 @@ namespace validation
     return max_orders;
   }
 
-  //make sure BUYER's affective records is no more than MAX_PAID_ORDERS
+  //make sure BUYER's affective records is no more than get_max_orders(BUYER)
   void validate_buyer(account_name buyer)
   {
     eosio_assert(buyer != code_account, "buyer cannot be bankofstaked");
