@@ -153,10 +153,11 @@ struct whitelist
 {
   account_name account;
   uint64_t capacity; // max in-use free orders
+  uint64_t updated_at; // unix time, in seconds
   uint64_t created_at; // unix time, in seconds
 
   account_name primary_key() const { return account; }
-  EOSLIB_SERIALIZE(whitelist, (account)(capacity)(created_at));
+  EOSLIB_SERIALIZE(whitelist, (account)(capacity)(updated_at)(created_at));
 };
 typedef multi_index<N(whitelist), whitelist> whitelist_table;
 

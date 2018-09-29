@@ -7,10 +7,11 @@ v=921459758687; k=history; declare "table_$k=$v";
 v=921459758687; k=order; declare "table_$k=$v";
 v=921459758687; k=freelock; declare "table_$k=$v";
 v=921459758687; k=blacklist; declare "table_$k=$v";
+v=921459758687; k=whitelist; declare "table_$k=$v";
 v=bankofstaked; k=plan; declare "table_$k=$v";
 
 
-for name in creditor plan order history freelock blacklist
+for name in creditor plan order history freelock blacklist whitelist
 do
   echo "==============TABLE "$name"========"
   scope="table_$name"
