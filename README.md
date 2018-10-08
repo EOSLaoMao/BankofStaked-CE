@@ -14,7 +14,7 @@
 ### About
 Bank of Staked is an EOS smart contract aiming to provide cheap CPU&NET lease to both EOS users and developers. This contract is build by `EOSLaoMao Team`.
 
-Bank of Staked is now alive on EOS Mainnet providing 1 free emergency plan and 3 paid plans. With 20+ block producers providing free creditors,  free emergency plan is now able to servce 20K EOS accounts simultaneously.
+Bank of Staked is now live on EOS Mainnet providing 1 free emergency plan and 3 paid plans. With 20+ block producers providing free creditors,  free emergency plan is now able to servce 20K EOS accounts simultaneously.
 
 Check it out: https://eoslaomao.com/bankofstaked
 
@@ -88,109 +88,3 @@ There are also several other tables facilitating this contract. such as,
 
 
 ![Process](./Order-Process-of-BankofStaked.svg)
-
-
-# Bank of Staked on Mainnet
-
-### How to use it
-
-We have deployed it on Mainnet: 
-
-https://www.myeoskit.com/#/tx/bankofstaked
-
-
-#### 1.Check available price plan
-
-Query `plan` table to get available plans:
-
-
-```
-cleos -u https://api1.eosasia.one get table bankofstaked bankofstaked plan
-
-{
-  "rows": [{
-      "id": 0,
-      "price": "0.1000 EOS",
-      "is_free": "1",
-      "cpu": "0.5000 EOS",
-      "net": "0.0000 EOS",
-      "duration": 360,
-      "created_at": 1535965927,
-      "updated_at": 1535965927
-    },{
-      "id": 1,
-      "price": "0.5000 EOS",
-      "is_free": "0",
-      "cpu": "50.0000 EOS",
-      "net": "0.0000 EOS",
-      "duration": 10080,
-      "created_at": 1535965927,
-      "updated_at": 1535965927
-    },{
-      "id": 2,
-      "price": "1.0000 EOS",
-      "is_free": "0",
-      "cpu": "110.0000 EOS",
-      "net": "0.0000 EOS",
-      "duration": 10080,
-      "created_at": 1535965927,
-      "updated_at": 1535965927
-    },{
-      "id": 3,
-      "price": "2.0000 EOS",
-      "is_free": "0",
-      "cpu": "240.0000 EOS",
-      "net": "0.0000 EOS",
-      "duration": 10080,
-      "created_at": 1535965927,
-      "updated_at": 1535965927
-    },
-  ],
-  "more": false
-}
-```
-
-`price` indicates the EOS you should transfer to `bankofstaked` to get certain `cpu` and `net` for `duration` minutes.
-
-`is_free` means if you can get a refund or not(is refund applied, it will happend immediately!!)
-
-Currently we provide:
-
-1 FREE plan: 
-
-`0.1 EOS` for `6 hours of 0.5 EOS CPU` staked, you will get a 0.1 EOS refund immediately after you transfer.
-
-3 PAID plans:
-
-`0.5 EOS` for `7 days of 50 EOS CPU` staked.
-
-`1.0 EOS` for `7 days of 110 EOS CPU` staked.
-
-`2.0 EOS` for `7 days of 240 EOS CPU` staked.
-
-Will add more plans ASAP.
-
-
-#### 2.Transfer EOS and get delegated!
-
-
-Currently, you can transfer `0.1 EOS` to `bankofstaked` to get `0.5 EOS` staked for `CPU` for `6 hours`. 
-
-NOTE: for free plan, `bankofstaked` will automatically return the token you transfered back to you immediately.
-
-
-```
-cleos -u https://api1.eosasia.one transfer YOUR_ACCOUNT bankofstaked "0.1 EOS" -p YOUR_ACCOUNT@active
-```
-
-After transfering token, you will be delegated `1 EOS of CPU` to you , after 6 hours, it will undelegate automatically using deferred transaction.
-
-
-
----
-
-if you want to contribute your EOS to creditor fund(only delegate, no transfer needed), or if you are a BP who are willing to help users and developers, please contact us at: contact@eoslaomao.com
-
-built with love by EOSLaoMao Team. :)
-
-Icon made by Freepik from www.flaticon.com, special thanks~
