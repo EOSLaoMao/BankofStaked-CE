@@ -26,7 +26,7 @@ The main logic of Bank of Staked are realized through the following three tables
 
 #### 1. Plan Table
 
-Plan table holds all avialible plans user can choose, key fields are:
+Plan table holds all avialible plans user can choose, main fields are:
 
 ```
 price			asset; //plan price
