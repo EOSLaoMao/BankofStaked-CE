@@ -96,14 +96,20 @@ class bankofstaked_tester : public tester
 
     fc::variant get_creditor(const account_name &act)
     {
-        vector<char> data = get_row_by_account(N(bankofstaked), 9214597586871, N(creditor), act);
+        vector<char> data = get_row_by_account(N(bankofstaked), 921459758687, N(creditor), act);
         return data.empty() ? EMPTY : abi_ser.binary_to_variant("creditor", data, abi_serializer_max_time);
     }
 
     fc::variant get_blacklist(const account_name &act)
     {
-        vector<char> data = get_row_by_account(N(bankofstaked), 9214597586871, N(blacklist), act);
+        vector<char> data = get_row_by_account(N(bankofstaked), 921459758687, N(blacklist), act);
         return data.empty() ? EMPTY : abi_ser.binary_to_variant("blacklist", data, abi_serializer_max_time);
+    }
+
+    fc::variant get_whitelist(const account_name &act)
+    {
+        vector<char> data = get_row_by_account(N(bankofstaked), 921459758687, N(whitelist), act);
+        return data.empty() ? EMPTY : abi_ser.binary_to_variant("whitelist", data, abi_serializer_max_time);
     }
 
     fc::variant get_account(account_name acc, const string &symbolname)
@@ -173,28 +179,36 @@ BOOST_FIXTURE_TEST_CASE(addcreditor_test, bankofstaked_tester)
 try
 {
     // add 3 creditors, alice/bob/carol
-    push_action(N(bankofstaked), N(addcreditor), mvo()("account", "alice")("for_free", 0), config::active_name);
-    push_action(N(bankofstaked), N(addcreditor), mvo()("account", "bob")("for_free", 0), config::active_name);
-    push_action(N(bankofstaked), N(addcreditor), mvo()("account", "carol")("for_free", 0), config::active_name);
+    push_action(N(bankofstaked), N(addcreditor), mvo()("account", "alice")("for_free", 1)("free_memo", "lucky you!"), config::active_name);
+    push_action(N(bankofstaked), N(addcreditor), mvo()("account", "bob")("for_free", 0)("free_memo", "hell yeah!"), config::active_name);
+    push_action(N(bankofstaked), N(addcreditor), mvo()("account", "carol")("for_free", 1)("free_memo", "oh"), config::active_name);
 
     auto creditor = get_creditor("alice");
     BOOST_REQUIRE_EQUAL(creditor["is_active"], 0);
+    BOOST_REQUIRE_EQUAL(creditor["for_free"], 1);
+    BOOST_REQUIRE_EQUAL(creditor["free_memo"], "lucky you!");
     BOOST_REQUIRE_EQUAL(creditor["account"], "alice");
     BOOST_REQUIRE_EQUAL(creditor["balance"], "500.0000 EOS");
     BOOST_REQUIRE_EQUAL(creditor["cpu_staked"], "0.0000 EOS");
     BOOST_REQUIRE_EQUAL(creditor["net_staked"], "0.0000 EOS");
     BOOST_REQUIRE_EQUAL(creditor["cpu_unstaked"], "0.0000 EOS");
     BOOST_REQUIRE_EQUAL(creditor["net_unstaked"], "0.0000 EOS");
+
     creditor = get_creditor("bob");
     BOOST_REQUIRE_EQUAL(creditor["is_active"], 0);
+    BOOST_REQUIRE_EQUAL(creditor["for_free"], 0);
+    BOOST_REQUIRE_EQUAL(creditor["free_memo"], "");
     BOOST_REQUIRE_EQUAL(creditor["account"], "bob");
     BOOST_REQUIRE_EQUAL(creditor["balance"], "5000.0000 EOS");
     BOOST_REQUIRE_EQUAL(creditor["cpu_staked"], "0.0000 EOS");
     BOOST_REQUIRE_EQUAL(creditor["net_staked"], "0.0000 EOS");
     BOOST_REQUIRE_EQUAL(creditor["cpu_unstaked"], "0.0000 EOS");
     BOOST_REQUIRE_EQUAL(creditor["net_unstaked"], "0.0000 EOS");
+
     creditor = get_creditor("carol");
     BOOST_REQUIRE_EQUAL(creditor["is_active"], 0);
+    BOOST_REQUIRE_EQUAL(creditor["for_free"], 1);
+    BOOST_REQUIRE_EQUAL(creditor["free_memo"], "oh");
     BOOST_REQUIRE_EQUAL(creditor["account"], "carol");
     BOOST_REQUIRE_EQUAL(creditor["balance"], "50000.0000 EOS");
     BOOST_REQUIRE_EQUAL(creditor["cpu_staked"], "0.0000 EOS");
@@ -208,9 +222,9 @@ BOOST_FIXTURE_TEST_CASE(activate_test, bankofstaked_tester)
 try
 {
     // add 3 creditors, alice/bob/carol
-    push_action(N(bankofstaked), N(addcreditor), mvo()("account", "alice")("for_free", 0), config::active_name);
-    push_action(N(bankofstaked), N(addcreditor), mvo()("account", "bob")("for_free", 0), config::active_name);
-    push_action(N(bankofstaked), N(addcreditor), mvo()("account", "carol")("for_free", 0), config::active_name);
+    push_action(N(bankofstaked), N(addcreditor), mvo()("account", "alice")("for_free", 0)("free_memo", ""), config::active_name);
+    push_action(N(bankofstaked), N(addcreditor), mvo()("account", "bob")("for_free", 0)("free_memo", ""), config::active_name);
+    push_action(N(bankofstaked), N(addcreditor), mvo()("account", "carol")("for_free", 0)("free_memo", ""), config::active_name);
     auto creditor = get_creditor("alice");
     BOOST_REQUIRE_EQUAL(creditor["is_active"], 0);
     creditor = get_creditor("bob");
@@ -234,8 +248,8 @@ BOOST_FIXTURE_TEST_CASE(delcreditor_test, bankofstaked_tester)
 try
 {
     // add 2 creditors, alice/bob
-    push_action(N(bankofstaked), N(addcreditor), mvo()("account", "alice")("for_free", 0), config::active_name);
-    push_action(N(bankofstaked), N(addcreditor), mvo()("account", "bob")("for_free", 0), config::active_name);
+    push_action(N(bankofstaked), N(addcreditor), mvo()("account", "alice")("for_free", 0)("free_memo", ""), config::active_name);
+    push_action(N(bankofstaked), N(addcreditor), mvo()("account", "bob")("for_free", 0)("free_memo", ""), config::active_name);
     auto creditor = get_creditor("alice");
     BOOST_REQUIRE_EQUAL(creditor["is_active"], 0);
     BOOST_REQUIRE_EQUAL(creditor["account"], "alice");
@@ -308,5 +322,25 @@ try
     BOOST_REQUIRE_EQUAL(blacklist, "0");
 }
 FC_LOG_AND_RETHROW()
+
+
+// test action addwhitelist
+BOOST_FIXTURE_TEST_CASE(addwhitelist_test, bankofstaked_tester)
+try
+{
+    // add 2 whitelist account, alice/bob
+    push_action(N(bankofstaked), N(addwhitelist), mvo()("account", "alice")("capacity", 100), config::active_name);
+    push_action(N(bankofstaked), N(addwhitelist), mvo()("account", "bob")("capacity", 1000), config::active_name);
+
+    auto whitelist = get_whitelist("alice");
+    BOOST_REQUIRE_EQUAL(whitelist["account"], "alice");
+    BOOST_REQUIRE_EQUAL(whitelist["capacity"], 100);
+
+    whitelist = get_whitelist("bob");
+    BOOST_REQUIRE_EQUAL(whitelist["account"], "bob");
+    BOOST_REQUIRE_EQUAL(whitelist["capacity"], 1000);
+}
+FC_LOG_AND_RETHROW()
+
 
 BOOST_AUTO_TEST_SUITE_END()

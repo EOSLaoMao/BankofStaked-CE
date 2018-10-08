@@ -5,6 +5,8 @@
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/multi_index.hpp>
 
+#define EOS_SYMBOL S(4, EOS)
+
 using namespace eosio;
 
 namespace bank
@@ -22,11 +24,12 @@ static const uint64_t MAX_EOS_BALANCE = 500 * 10000; // 500 EOS at most
 static const uint64_t MIN_CREDITOR_BALANCE = 10 * 10000; // 10 EOS at least
 
 // To protect your table, you can specify different scope as random numbers
-static const uint64_t SCOPE_ORDER = 18429195173743;
-static const uint64_t SCOPE_HISTORY = 18429195173743;
-static const uint64_t SCOPE_CREDITOR = 18429195173743;
-static const uint64_t SCOPE_FREELOCK = 18429195173743;
-static const uint64_t SCOPE_BLACKLIST = 18429195173743;
+static const uint64_t SCOPE_ORDER = 1842919517374;
+static const uint64_t SCOPE_HISTORY = 1842919517374;
+static const uint64_t SCOPE_CREDITOR = 1842919517374;
+static const uint64_t SCOPE_FREELOCK = 1842919517374;
+static const uint64_t SCOPE_BLACKLIST = 1842919517374;
+static const uint64_t SCOPE_WHITELIST = 1842919517374;
 
 // @abi table freelock i64
 struct freelock
@@ -95,12 +98,13 @@ struct plan
   asset net;           // amount of EOS staked for net
   uint64_t duration;   // affective time, in minutes
   uint64_t is_free;    // default is FALSE, for free plan, when service expired, it will do a auto refund
+  uint64_t is_active;  // on active plan could be choosen
   uint64_t created_at; // unix time, in seconds
   uint64_t updated_at; // unix time, in seconds
 
   auto primary_key() const { return id; }
   uint64_t get_price() const { return (uint64_t)price.amount; }
-  EOSLIB_SERIALIZE(plan, (id)(price)(cpu)(net)(duration)(is_free)(created_at)(updated_at));
+  EOSLIB_SERIALIZE(plan, (id)(price)(cpu)(net)(duration)(is_free)(is_active)(created_at)(updated_at));
 };
 typedef multi_index<N(plan), plan,
                     indexed_by<N(price), const_mem_fun<plan, uint64_t, &plan::get_price>>>
@@ -112,6 +116,7 @@ struct creditor
   account_name account;
   uint64_t is_active;
   uint64_t for_free;         // default is FALSE, for_free means if this creditor provide free staking or not
+  string free_memo;    // memo for refund transaction
   asset balance;              // amount of EOS paied
   asset cpu_staked;              // amount of EOS paied
   asset net_staked;              // amount of EOS paied
@@ -124,7 +129,7 @@ struct creditor
   uint64_t get_is_active() const { return is_active; }
   uint64_t get_updated_at() const { return updated_at; }
 
-  EOSLIB_SERIALIZE(creditor, (account)(is_active)(for_free)(balance)(cpu_staked)(net_staked)(cpu_unstaked)(net_unstaked)(created_at)(updated_at));
+  EOSLIB_SERIALIZE(creditor, (account)(is_active)(for_free)(free_memo)(balance)(cpu_staked)(net_staked)(cpu_unstaked)(net_unstaked)(created_at)(updated_at));
 };
 
 typedef multi_index<N(creditor), creditor,
@@ -142,4 +147,20 @@ struct blacklist
   EOSLIB_SERIALIZE(blacklist, (account)(created_at));
 };
 typedef multi_index<N(blacklist), blacklist> blacklist_table;
-} // namespace bank
+
+// @abi table whitelist i64
+struct whitelist
+{
+  account_name account;
+  uint64_t capacity; // max in-use free orders
+  uint64_t updated_at; // unix time, in seconds
+  uint64_t created_at; // unix time, in seconds
+
+  account_name primary_key() const { return account; }
+  EOSLIB_SERIALIZE(whitelist, (account)(capacity)(updated_at)(created_at));
+};
+typedef multi_index<N(whitelist), whitelist> whitelist_table;
+
+}// namespace bank
+
+
