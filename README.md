@@ -12,15 +12,21 @@
 ### About
 Bank of Staked is an EOS smart contract aiming to provide cheap CPU&NET lease to both EOS users and developers. This contract is build by `EOSLaoMao Team`.
 
+Bank of Staked is now alive on EOS Mainnet providing 1 free emergency plan and 3 paid plans. With 20+ block producers providing free creditors,  free emergency plan is now able to servce 20K EOS accounts simultaneously.
+
+Check it out: https://eoslaomao.com/bankofstaked
+
+For more details, check announcement here: https://steemit.com/eos/@eoslaomao/announcing-bankofstaked-a-self-serve-cpu-and-net-resource-vending-machine-supported-by-block-producers
+
 ### Design
 
-The UX Bank of Staked wants to achieve is that any account could get CPU&NET delegated automatically through a simple transfer, no more action needed. And the undelegate process will also be triggered automatically.
+The user experience Bank of Staked wants to achieve is that any account could get CPU&NET delegated automatically through a simple transfer, no more action needed. And the undelegate process will also be triggered automatically.
 
-The main logic of Bank of Staked are realized through these three tables:
+The main logic of Bank of Staked are realized through the following three tables:
 
 #### 1. Plan Table
 
-Plan table holds all avialible plans user can choose, main fields are:
+Plan table holds all avialible plans user can choose, key fields are:
 
 ```
 price			asset; //plan price
@@ -33,7 +39,7 @@ is_free			uint64; //free plan or not, if is_free is 1, order will be auto refund
 
 #### 2. Creditor Table
 
-`Creditors` are the real ones who delegate&undelegate. When a valid transfer happens, the contract will try to find `is_active` creditor to do an auto delegation using that creditor account.
+`Creditors` are the actual accounts who delegate and undelegate. When a valid transfer happens, the contract will try to find `active` creditor to do an auto delegation using that creditor account.
 
 ```
 account			account_name;
@@ -41,13 +47,13 @@ is_active		uint64;
 ...
 ```
 
-`is_active` indicates if this creditor is ready to delegate or not.
+`is_active` indicates if this creditor is ready to serve new orders.
 
-in production, you should always have creditors shifting like 3 days in a roll, so that non-active creditors have time to get their undelegated token back.
+in production, you should always have creditors shifting like X days in a roll(X depends on plans it provide), so that non-active creditors have enough time to get their undelegated token back.
 
 #### 3. Order Table
 
-Order table consists of active order records, by active, we mean these orders are not expired.
+Order table consists of active order records, by active, it means these orders are not expired.
 
 ```
 buyer				account_name;
@@ -65,7 +71,7 @@ expire_at			uint64;
 
 `creditor` is the account who did delegation.
 
-`cpu_staked` and `net_staked` is cpu&net delegated in this order.
+`cpu_staked` and `net_staked` is CPU&NET delegated in this order.
 
 `expire_at` is when this order will expire. After order expired, order record will be deleted from Order Table.
 
@@ -104,9 +110,36 @@ cleos -u https://api1.eosasia.one get table bankofstaked bankofstaked plan
       "id": 0,
       "price": "0.1000 EOS",
       "is_free": "1",
-      "cpu": "1.0000 EOS",
+      "cpu": "0.5000 EOS",
       "net": "0.0000 EOS",
-      "duration": 60,
+      "duration": 360,
+      "created_at": 1535965927,
+      "updated_at": 1535965927
+    },{
+      "id": 1,
+      "price": "0.5000 EOS",
+      "is_free": "0",
+      "cpu": "50.0000 EOS",
+      "net": "0.0000 EOS",
+      "duration": 10080,
+      "created_at": 1535965927,
+      "updated_at": 1535965927
+    },{
+      "id": 2,
+      "price": "1.0000 EOS",
+      "is_free": "0",
+      "cpu": "110.0000 EOS",
+      "net": "0.0000 EOS",
+      "duration": 10080,
+      "created_at": 1535965927,
+      "updated_at": 1535965927
+    },{
+      "id": 3,
+      "price": "2.0000 EOS",
+      "is_free": "0",
+      "cpu": "240.0000 EOS",
+      "net": "0.0000 EOS",
+      "duration": 10080,
       "created_at": 1535965927,
       "updated_at": 1535965927
     },
@@ -119,7 +152,19 @@ cleos -u https://api1.eosasia.one get table bankofstaked bankofstaked plan
 
 `is_free` means if you can get a refund or not(is refund applied, it will happend immediately!!)
 
-Currently we only provide 1 FREE plan: `0.1 EOS` for `60 min of 1 EOS CPU` staked, you will get a 0.1 EOS refund immediately after you transfer.
+Currently we provide:
+
+1 FREE plan: 
+
+`0.1 EOS` for `6 hours of 0.5 EOS CPU` staked, you will get a 0.1 EOS refund immediately after you transfer.
+
+3 PAID plans:
+
+`0.5 EOS` for `7 days of 50 EOS CPU` staked.
+
+`1.0 EOS` for `7 days of 110 EOS CPU` staked.
+
+`2.0 EOS` for `7 days of 240 EOS CPU` staked.
 
 Will add more plans ASAP.
 
@@ -127,17 +172,16 @@ Will add more plans ASAP.
 #### 2.Transfer EOS and get delegated!
 
 
-Currently, you can transfer `0.1 EOS` to `bankofstaked` to get `1 EOS` staked for `cpu` for `60 minutes`. 
+Currently, you can transfer `0.1 EOS` to `bankofstaked` to get `0.5 EOS` staked for `CPU` for `6 hours`. 
 
-NOTE: `bankofstaked` will automatically return the token you transfered back to you immediately.
-
+NOTE: for free plan, `bankofstaked` will automatically return the token you transfered back to you immediately.
 
 
 ```
 cleos -u https://api1.eosasia.one transfer YOUR_ACCOUNT bankofstaked "0.1 EOS" -p YOUR_ACCOUNT@active
 ```
 
-After transfering token, you will be delegated `1 EOS of CPU` to you , after 60 minutes, it will undelegate automatically using deferred transaction.
+After transfering token, you will be delegated `1 EOS of CPU` to you , after 6 hours, it will undelegate automatically using deferred transaction.
 
 
 
