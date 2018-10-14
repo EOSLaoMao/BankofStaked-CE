@@ -18,6 +18,11 @@ cleos -u $API push action bankofstaked addcreditor '{"account": "eoscafestake", 
 cleos -u $API push action bankofstaked addcreditor '{"account": "eosgravitygo", "for_free": 1, "free_memo": "A gift from EOS Gravity"}' -p bankofstaked
 cleos -u $API push action bankofstaked addcreditor '{"account": "eosriobrfree", "for_free": 1, "free_memo": "A gift from EOS Rio"}' -p bankofstaked
 cleos -u $API push action bankofstaked addcreditor '{"account": "eosriostaked", "for_free": 0, "free_memo": ""}' -p bankofstaked
+cleos -u $API push action bankofstaked addcreditor '{"account": "bosauthority", "for_free": 1, "free_memo": "A gift from EOS Authority"}' -p bankofstaked
+cleos -u $API push action bankofstaked addcreditor '{"account": "eostribefree", "for_free": 1, "free_memo": "A gift from EOS Tribe"}' -p bankofstaked
+cleos -u $API push action bankofstaked addcreditor '{"account": "eostribecred", "for_free": 0, "free_memo": ""}' -p bankofstaked
+cleos -u $API push action bankofstaked addcreditor '{"account": "eospacificbs", "for_free": 1, "free_memo": "A gift from EOS Pacific"}' -p bankofstaked
+cleos -u $API push action bankofstaked addcreditor '{"account": "eos42reserve", "for_free": 1, "free_memo": "A gift from EOS42"}' -p bankofstaked
 #cleos -u $API push action bankofstaked activate '{"account": "charity.bank"}' -p bankofstaked
 #cleos -u $API push action bankofstaked activate '{"account": "staking.bank"}' -p bankofstaked
 #cleos -u $API push action bankofstaked activate '{"account": "eosbeijinghp"}' -p bankofstaked
