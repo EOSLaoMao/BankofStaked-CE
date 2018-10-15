@@ -22,6 +22,19 @@ public:
   bankofstaked(name self) : contract(self) {}
 
 
+  // @abi action clearhistory
+  void clearhistory()
+  {
+    history_table o(code_account, SCOPE_ORDER>>1);
+    while (o.begin() != o.end())
+    {
+      auto itr = o.end();
+      itr--;
+      o.erase(itr);
+      order_table o(code_account, SCOPE_ORDER>>1);
+    }
+  }
+
   // DEBUG only, action to empty entires in both tables
   // @abi action empty
   void empty()
@@ -356,7 +369,8 @@ public:
           (addblacklist)
           (delblacklist)
           (activate)
-          (check));
+          (check)
+          (clearhistory));
     };
   }
 
