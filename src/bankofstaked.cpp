@@ -25,9 +25,14 @@ public:
   // @abi action clearhistory
   void clearhistory()
   {
+    uint64_t depth = 0;
     history_table o(code_account, SCOPE_ORDER>>1);
     while (o.begin() != o.end())
     {
+      depth += 1;
+      if(depth >100) {
+        break;
+      }
       auto itr = o.end();
       itr--;
       o.erase(itr);
