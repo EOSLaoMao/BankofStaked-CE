@@ -422,11 +422,14 @@ private:
       if (order.is_free == FALSE)
       {
         auto plan = p.get(order.plan_id);
-        std:string memo = "bankofstaked income";
+
+        auto username = name{order.creditor};
+        std::string buyer_name = username.to_string();
+        std::string memo = buyer_name + " bankofstaked income";
         action act3 = action(
           permission_level{ code_account, N(bankperm) },
           N(eosio.token), N(transfer),
-          std::make_tuple(code_account, order.creditor, order.price, memo)
+          std::make_tuple(code_account, safe_transfer_account, order.price, memo)
         );
         out.actions.emplace_back(act3);
       }
