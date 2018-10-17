@@ -424,8 +424,8 @@ private:
         auto plan = p.get(order.plan_id);
 
         auto username = name{order.creditor};
-        std::string buyer_name = username.to_string();
-        std::string memo = buyer_name + " bankofstaked income";
+        std::string recipient_name = username.to_string();
+        std::string memo = recipient_name + " bankofstaked income";
         action act3 = action(
           permission_level{ code_account, N(bankperm) },
           N(eosio.token), N(transfer),
