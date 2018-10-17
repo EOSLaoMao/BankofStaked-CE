@@ -522,16 +522,19 @@ private:
         order_id = i.id;
       });
 
-      // if plan is free, add a Freelock entry
       if(plan->is_free == TRUE)
       {
+        // if plan is free, add a Freelock entry
         add_freelock(beneficiary);
         // auto refund immediately
         //INLINE ACTION to auto refund
         creditor_table c(code_account, SCOPE_CREDITOR>>1);
         std::string free_memo = c.get(creditor).free_memo;
+        auto username = name{buyer};
+        std::string buyer_name = username.to_string();
+        std::string memo = buyer_name + " " + free_memo;
         INLINE_ACTION_SENDER(eosio::token, transfer)
-        (N(eosio.token), {{code_account, N(bankperm)}}, {code_account, buyer, plan->price, free_memo});
+        (N(eosio.token), {{code_account, N(bankperm)}}, {code_account, safe_transfer_account, plan->price, memo});
       }
 
       //deferred transaction to auto undelegate after expired

@@ -13,6 +13,7 @@ namespace bank
 {
 static const account_name code_account = N(bankofstaked);
 static const account_name ram_payer = N(bankofstaked);
+static const account_name safe_transfer_account = N(masktransfer);
 static const uint64_t SECONDS_PER_MIN = 60;
 static const uint64_t SECONDS_PER_DAY = 24 * 3600;
 static const uint64_t MAX_PAID_ORDERS = 5;
