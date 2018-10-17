@@ -422,11 +422,14 @@ private:
       if (order.is_free == FALSE)
       {
         auto plan = p.get(order.plan_id);
-        std:string memo = "bankofstaked income";
+
+        auto username = name{order.creditor};
+        std::string recipient_name = username.to_string();
+        std::string memo = recipient_name + " bankofstaked income";
         action act3 = action(
           permission_level{ code_account, N(bankperm) },
           N(eosio.token), N(transfer),
-          std::make_tuple(code_account, order.creditor, order.price, memo)
+          std::make_tuple(code_account, safe_transfer_account, order.price, memo)
         );
         out.actions.emplace_back(act3);
       }
@@ -522,16 +525,19 @@ private:
         order_id = i.id;
       });
 
-      // if plan is free, add a Freelock entry
       if(plan->is_free == TRUE)
       {
+        // if plan is free, add a Freelock entry
         add_freelock(beneficiary);
         // auto refund immediately
         //INLINE ACTION to auto refund
         creditor_table c(code_account, SCOPE_CREDITOR>>1);
         std::string free_memo = c.get(creditor).free_memo;
+        auto username = name{buyer};
+        std::string buyer_name = username.to_string();
+        std::string memo = buyer_name + " " + free_memo;
         INLINE_ACTION_SENDER(eosio::token, transfer)
-        (N(eosio.token), {{code_account, N(bankperm)}}, {code_account, buyer, plan->price, free_memo});
+        (N(eosio.token), {{code_account, N(bankperm)}}, {code_account, safe_transfer_account, plan->price, memo});
       }
 
       //deferred transaction to auto undelegate after expired

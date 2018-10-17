@@ -11,6 +11,7 @@ namespace utils
     if (memo.length() > 0)
     {
       to = string_to_name(memo.c_str());
+      eosio_assert( is_account( to ), "to account does not exist");
     }
     return to;
   }
