@@ -25,6 +25,7 @@ public:
   // @abi action clearhistory
   void clearhistory()
   {
+    require_auth(code_account);
     uint64_t depth = 0;
     history_table o(code_account, SCOPE_ORDER>>1);
     while (o.begin() != o.end())
