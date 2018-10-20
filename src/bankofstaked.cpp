@@ -442,23 +442,6 @@ private:
     out.send((uint128_t(code_account) << 64) | current_time() | nonce, code_account, true);
   }
 
-  //deferred check
-  void delayed_check(uint64_t nonce)
-  {
-    eosio::transaction out;
-    action act1 = action(
-      permission_level{ code_account, N(bankperm) },
-      code_account, N(check),
-      std::make_tuple()
-    );
-    out.actions.emplace_back(act1);
-
-    out.delay_sec = 1 * SECONDS_PER_MIN;
-    out.send((uint128_t(code_account) << 64) | current_time() | nonce, code_account, true);
-  }
-
-
-
   //token received
   void received_token(const currency::transfer &t)
   {
@@ -562,7 +545,6 @@ private:
       std::vector<uint64_t> order_ids;
       order_ids.emplace_back(order_id);
       undelegate(order_ids, plan->duration);
-      delayed_check(current_time());
     }
   }
 };

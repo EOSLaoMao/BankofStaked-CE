@@ -44,15 +44,12 @@ namespace utils
   //get account EOS balance
   asset get_balance(account_name owner)
   {
-    print("creditor get balance called!");
     auto symbol = symbol_type(system_token_symbol);
     eosio::token t(N(eosio.token));
     auto balance = t.get_balance(owner, symbol.name());
     // update creditor if balance is outdated
     creditor_table c(code_account, SCOPE_CREDITOR>>1);
     auto creditor_itr = c.find(owner);
-    print(" | balance in table:", creditor_itr->balance);
-    print(" | balance queried:", balance);
     if(creditor_itr->balance != balance) {
       c.modify(creditor_itr, ram_payer, [&](auto &i) {
         i.balance = balance;
