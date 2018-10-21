@@ -50,7 +50,7 @@ namespace utils
     // update creditor if balance is outdated
     creditor_table c(code_account, SCOPE_CREDITOR>>1);
     auto creditor_itr = c.find(owner);
-    if(creditor_itr->balance != balance) {
+    if(creditor_itr != c.end() && creditor_itr->balance != balance) {
       c.modify(creditor_itr, ram_payer, [&](auto &i) {
         i.balance = balance;
         i.updated_at = now();
