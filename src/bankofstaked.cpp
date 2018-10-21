@@ -446,13 +446,13 @@ private:
       //1. buyer shouldnt be code_account
       //2. buyer shouldnt be in blacklist
       //3. each buyer could only have 5 affective orders at most
-      validate_buyer(buyer);
+      validate_buyer(buyer, plan->is_free);
 
       //validate beneficiary
       //1. beneficiary shouldnt be code_account
       //2. beneficiary shouldnt be in blacklist
       //3. each beneficiary could only have 5 affective orders at most
-      validate_beneficiary(beneficiary, creditor);
+      validate_beneficiary(beneficiary, creditor, plan->is_free);
 
       //INLINE ACTION to delegate CPU&NET for beneficiary account
       INLINE_ACTION_SENDER(eosiosystem::system_contract, delegatebw)
