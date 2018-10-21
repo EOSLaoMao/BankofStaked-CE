@@ -10,7 +10,7 @@ namespace validation
   {
     freelock_table f(code_account, SCOPE_FREELOCK>>1);
     auto itr = f.find(beneficiary);
-    eosio_assert(itr == f.end(), "free plan is avaliable every 24 hours");
+    eosio_assert(itr == f.end(), "free plan is avaliable every 24 hours for each beneficiary");
   }
 
   // check blacklist
@@ -21,10 +21,10 @@ namespace validation
     eosio_assert(itr == b.end(), "something wrong with your account");
   }
 
-  //get BUYER's order amount limit
-  uint64_t get_max_orders(account_name buyer)
+  //get BUYER's free order amount limit
+  uint64_t get_free_order_cap(account_name buyer)
   {
-    uint64_t max_orders = MAX_PAID_ORDERS;
+    uint64_t max_orders = MAX_FREE_ORDERS;
     whitelist_table w(code_account, SCOPE_WHITELIST>>1);
     auto itr = w.find(buyer);
     if(itr != w.end())
@@ -34,34 +34,54 @@ namespace validation
     return max_orders;
   }
 
-  //make sure BUYER's affective records is no more than get_max_orders(BUYER)
-  void validate_buyer(account_name buyer)
+  //make sure BUYER's affective records is no more than get_free_order_cap(BUYER)
+  void validate_buyer(account_name buyer, uint64_t is_free)
   {
     eosio_assert(buyer != code_account, "buyer cannot be bankofstaked");
 
     //validate blacklist
     validate_blacklist(buyer);
 
-    uint64_t max_orders = get_max_orders(buyer);
-    std::string suffix = " affective orders per buyer at most";
+    // for paid orders, check MAX_PAID_ORDERS
+    // for free orders, check get_free_order_cap()
+    uint64_t max_orders = MAX_PAID_ORDERS;
+    if(is_free == TRUE) {
+      max_orders = get_free_order_cap(buyer);
+    }
+    std::string suffix = " affective orders at most for each buyer";
     std::string error_msg = std::to_string(max_orders) + suffix;
 
     order_table o(code_account, SCOPE_ORDER>>1);
     auto idx = o.get_index<N(buyer)>();
     auto first = idx.lower_bound(buyer);
     auto last = idx.upper_bound(buyer);
-    uint64_t count = std::distance(first, last);
+    uint64_t count = 0;
+    while(first != last && first != idx.end())
+    {
+      if(first->is_free == is_free)
+      {
+        count += 1;
+      }
+      first++;
+    }
     eosio_assert(count < max_orders, error_msg.c_str());
   }
 
-  //make sure BENEFICIARY's affective records is no more than MAX_PAID_ORDERS
-  void validate_beneficiary(account_name beneficiary, account_name creditor)
+  //make sure BENEFICIARY's affective free orders is no more than MAX_FREE_ORDERS
+  void validate_beneficiary(account_name beneficiary, account_name creditor, uint64_t is_free)
   {
     eosio_assert(beneficiary != code_account, "cannot delegate to bankofstaked");
     eosio_assert(beneficiary != creditor, "cannot delegate to creditor");
 
     //validate blacklist
     validate_blacklist(beneficiary);
+
+    // for paid orders, check MAX_PAID_ORDERS
+    // for free orders, check MAX_FREE_ORDERS
+    uint64_t max_orders = MAX_PAID_ORDERS;
+    if(is_free == TRUE) {
+      max_orders = MAX_FREE_ORDERS;
+    }
 
     //make sure the account has less than MAX_BALANCE EOS in balance
     //disabled temperarily because of account not found issue
@@ -75,10 +95,18 @@ namespace validation
     auto idx = o.get_index<N(beneficiary)>();
     auto first = idx.lower_bound(beneficiary);
     auto last = idx.upper_bound(beneficiary);
-    uint64_t count = std::distance(first, last);
-    std::string suffix = " affective orders per buyer at most";
-    std::string error_msg = std::to_string(MAX_PAID_ORDERS) + suffix;
-    eosio_assert(count < MAX_PAID_ORDERS, error_msg.c_str());
+    uint64_t count = 0;
+    while(first != last && first != idx.end())
+    {
+      if(first->is_free == is_free)
+      {
+        count += 1;
+      }
+      first++;
+    }
+    std::string suffix = " affective orders at most for each beneficiary";
+    std::string error_msg = std::to_string(max_orders) + suffix;
+    eosio_assert(count < max_orders, error_msg.c_str());
   }
 
 
