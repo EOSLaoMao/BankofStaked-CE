@@ -133,17 +133,13 @@ namespace utils
     auto paid_rotated = paid_balance.amount > min_paid_creditor_balance ?TRUE:FALSE;
     auto idx = c.get_index<N(updated_at)>();
     auto itr = idx.begin();
-    auto count = 0;
     while (itr != idx.end())
     {
-      count += 1;
-      auto username = name{itr->account};
-      std::string from_name = username.to_string();
       if(itr->for_free == TRUE)
       {
         if(free_rotated == TRUE){itr++;continue;}
         auto balance = get_balance(itr->account);
-        if (itr->account != free_creditor && balance.amount >= MIN_FREE_CREDITOR_BALANCE)
+        if (itr->account != free_creditor && balance.amount > MIN_FREE_CREDITOR_BALANCE)
         {
           activate_creditor(itr->account);
           free_rotated = TRUE;
@@ -154,7 +150,7 @@ namespace utils
       {
         if(paid_rotated == TRUE){itr++;continue;}
         auto balance = get_balance(itr->account);
-        if (itr->account != paid_creditor && balance.amount >= min_paid_creditor_balance)
+        if (itr->account != paid_creditor && balance.amount > min_paid_creditor_balance)
         {
           activate_creditor(itr->account);
           paid_rotated = TRUE;
