@@ -128,7 +128,6 @@ namespace utils
     asset free_balance = get_balance(free_creditor);
     asset paid_balance = get_balance(paid_creditor);
     uint64_t min_paid_creditor_balance = get_min_paid_creditor_balance();
-    //uint64_t min_paid_creditor_balance = MIN_FREE_CREDITOR_BALANCE;
     auto free_rotated = free_balance.amount > MIN_FREE_CREDITOR_BALANCE ?TRUE:FALSE;
     auto paid_rotated = paid_balance.amount > min_paid_creditor_balance ?TRUE:FALSE;
     auto idx = c.get_index<N(updated_at)>();
