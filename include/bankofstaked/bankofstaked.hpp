@@ -1,5 +1,5 @@
 /**
- *  @file bankofmemory.hpp
+ *  @file bankofstaked.hpp
  */
 #include <eosiolib/asset.hpp>
 #include <eosiolib/eosio.hpp>
@@ -22,7 +22,7 @@ static const uint64_t TRUE = 1;
 static const uint64_t FALSE = 0;
 static const uint64_t CHECK_MAX_DEPTH = 3;
 static const uint64_t MAX_EOS_BALANCE = 500 * 10000; // 500 EOS at most
-static const uint64_t MIN_CREDITOR_BALANCE = 10 * 10000; // 10 EOS at least
+static const uint64_t MIN_FREE_CREDITOR_BALANCE = 10 * 10000; // 10 EOS at least
 
 // To protect your table, you can specify different scope as random numbers
 static const uint64_t SCOPE_ORDER = 1842919517374;

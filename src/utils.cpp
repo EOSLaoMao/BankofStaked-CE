@@ -59,6 +59,28 @@ namespace utils
     return balance;
   }
 
+  /*
+  //get min paid creditor balance
+  uint64_t get_min_paid_creditor_balance()
+  {
+
+    plan_table p(code_account, code_account);
+    auto itr = p.begin();
+    uint64_t balance = 0;
+    print(" | zero balance:", balance);
+    while (itr != p.end())
+    {
+      print(" | inner balance:", itr->price.amount);
+      balance = itr->price.amount;
+      if (itr->is_free == false && itr->is_active && itr->price.amount < balance) {
+        balance = itr->price.amount;
+      }
+      itr++;
+    }
+    print(" | min balance:", balance);
+    return balance;
+  }*/
+
   //rotate active creditor
   void rotate_creditor()
   {
@@ -70,8 +92,10 @@ namespace utils
     auto itr = idx.begin();
     asset free_balance = get_balance(free_creditor);
     asset paid_balance = get_balance(paid_creditor);
-    auto free_rotated = free_balance.amount > MIN_CREDITOR_BALANCE ?TRUE:FALSE;
-    auto paid_rotated = paid_balance.amount > MIN_CREDITOR_BALANCE ?TRUE:FALSE;
+    //uint64_t min_paid_creditor_balance = get_min_paid_creditor_balance();
+    auto free_rotated = free_balance.amount > MIN_FREE_CREDITOR_BALANCE ?TRUE:FALSE;
+    //auto paid_rotated = paid_balance.amount > min_paid_creditor_balance.amount ?TRUE:FALSE;
+    auto paid_rotated = paid_balance.amount > MIN_FREE_CREDITOR_BALANCE ?TRUE:FALSE;
 
     while (itr != idx.end())
     {
