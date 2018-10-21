@@ -45,7 +45,7 @@ namespace validation
     // for paid orders, check MAX_PAID_ORDERS
     // for free orders, check get_free_order_cap()
     uint64_t max_orders = MAX_PAID_ORDERS;
-    if(is_free == 1) {
+    if(is_free == TRUE) {
       max_orders = get_free_order_cap(buyer);
     }
     std::string suffix = " affective orders at most for each buyer";
@@ -79,7 +79,7 @@ namespace validation
     // for paid orders, check MAX_PAID_ORDERS
     // for free orders, check MAX_FREE_ORDERS
     uint64_t max_orders = MAX_PAID_ORDERS;
-    if(is_free == 1) {
+    if(is_free == TRUE) {
       max_orders = MAX_FREE_ORDERS;
     }
 
