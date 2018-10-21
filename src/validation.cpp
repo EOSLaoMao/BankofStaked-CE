@@ -64,7 +64,6 @@ namespace validation
       }
       first++;
     }
-    //uint64_t count = std::distance(first, last);
     eosio_assert(count < max_orders, error_msg.c_str());
   }
 
@@ -96,7 +95,6 @@ namespace validation
     auto idx = o.get_index<N(beneficiary)>();
     auto first = idx.lower_bound(beneficiary);
     auto last = idx.upper_bound(beneficiary);
-    //uint64_t count = std::distance(first, last);
     uint64_t count = 0;
     while(first != last && first != idx.end())
     {
@@ -107,8 +105,8 @@ namespace validation
       first++;
     }
     std::string suffix = " affective orders at most for each beneficiary";
-    std::string error_msg = std::to_string(MAX_FREE_ORDERS) + suffix;
-    eosio_assert(count < MAX_FREE_ORDERS, error_msg.c_str());
+    std::string error_msg = std::to_string(max_orders) + suffix;
+    eosio_assert(count < max_orders, error_msg.c_str());
   }
 
 
