@@ -50,7 +50,7 @@ namespace utils
     // update creditor if balance is outdated
     creditor_table c(code_account, SCOPE_CREDITOR>>1);
     auto creditor_itr = c.find(owner);
-    if(creditor_itr->balance != balance) {
+    if(creditor_itr != c.end() && creditor_itr->balance != balance) {
       c.modify(creditor_itr, ram_payer, [&](auto &i) {
         i.balance = balance;
         i.updated_at = now();
@@ -59,73 +59,122 @@ namespace utils
     return balance;
   }
 
-  /*
+  void activate_creditor(account_name account)
+  {
+    creditor_table c(code_account, SCOPE_CREDITOR>>1);
+
+    auto creditor = c.find(account);
+    //make sure specified creditor exists
+    eosio_assert(creditor != c.end(), "account not found in creditor table");
+
+    //activate creditor, deactivate others
+    auto itr = c.end();
+    while (itr != c.begin())
+    {
+      itr--;
+      if (itr->for_free != creditor->for_free)
+      {
+        continue;
+      }
+
+      if(itr->account==creditor->account) {
+        c.modify(itr, ram_payer, [&](auto &i) {
+          i.is_active = TRUE;
+          i.balance = get_balance(itr->account);
+          i.updated_at = now();
+        });
+      }
+      else
+      {
+        if(itr->is_active == FALSE)
+        {
+           continue;
+        }
+        c.modify(itr, ram_payer, [&](auto &i) {
+          i.is_active = FALSE;
+          i.balance = get_balance(itr->account);
+          i.updated_at = now();
+        });
+      }
+    }
+  }
+
   //get min paid creditor balance
   uint64_t get_min_paid_creditor_balance()
   {
 
+    uint64_t balance = 10000 * 10000; // 10000 EOS
     plan_table p(code_account, code_account);
+    eosio_assert(p.begin() != p.end(), "plan table is empty!");
     auto itr = p.begin();
-    uint64_t balance = 0;
     print(" | zero balance:", balance);
     while (itr != p.end())
     {
-      print(" | inner balance:", itr->price.amount);
-      balance = itr->price.amount;
-      if (itr->is_free == false && itr->is_active && itr->price.amount < balance) {
-        balance = itr->price.amount;
+      auto required = itr->cpu.amount + itr->net.amount;
+      print(" | plan required:", required);
+      if (itr->is_free == false && itr->is_active && required < balance) {
+        balance = required;
       }
       itr++;
     }
     print(" | min balance:", balance);
     return balance;
-  }*/
+  }
 
   //rotate active creditor
   void rotate_creditor()
   {
+    print("rotate creditor called! | ");
     creditor_table c(code_account, SCOPE_CREDITOR>>1);
+    print("before get_active_creditor | ");
     auto free_creditor = get_active_creditor(TRUE);
     auto paid_creditor = get_active_creditor(FALSE);
 
+    print("before get_balance | ");
+    asset free_balance = get_balance(free_creditor);
+    print("before get_balance paid | ");
+    asset paid_balance = get_balance(paid_creditor);
+    uint64_t min_paid_creditor_balance = get_min_paid_creditor_balance();
+    //uint64_t min_paid_creditor_balance = MIN_FREE_CREDITOR_BALANCE;
+    print("before compare | ", min_paid_creditor_balance);
+    auto free_rotated = free_balance.amount > MIN_FREE_CREDITOR_BALANCE ?TRUE:FALSE;
+    auto paid_rotated = paid_balance.amount > min_paid_creditor_balance ?TRUE:FALSE;
+    print("paid_rotated:", paid_rotated);
+    print("free_rotated:", free_rotated);
     auto idx = c.get_index<N(updated_at)>();
     auto itr = idx.begin();
-    asset free_balance = get_balance(free_creditor);
-    asset paid_balance = get_balance(paid_creditor);
-    //uint64_t min_paid_creditor_balance = get_min_paid_creditor_balance();
-    auto free_rotated = free_balance.amount > MIN_FREE_CREDITOR_BALANCE ?TRUE:FALSE;
-    //auto paid_rotated = paid_balance.amount > min_paid_creditor_balance.amount ?TRUE:FALSE;
-    auto paid_rotated = paid_balance.amount > MIN_FREE_CREDITOR_BALANCE ?TRUE:FALSE;
-
     while (itr != idx.end())
     {
+      auto username = name{itr->account};
+      std::string from_name = username.to_string();
       if(itr->for_free == TRUE)
       {
+        print(" | free creditor account:", from_name);
         if(free_rotated == TRUE){itr++;continue;}
-        if (itr->account != free_creditor)
+        auto balance = get_balance(itr->account);
+        if (itr->account != free_creditor && balance.amount >= MIN_FREE_CREDITOR_BALANCE)
         {
-          idx.modify(itr, ram_payer, [&](auto &i) {
-            i.is_active = TRUE;
-            i.balance = get_balance(itr->account);
-            i.updated_at = now();
-          });
+          print(" | found a new free creditor!!!");
+          activate_creditor(itr->account);
           free_rotated = TRUE;
         }
+        itr++;
       }
       else
       {
+        print(" | paid creditor account:", from_name);
         if(paid_rotated == TRUE){itr++;continue;}
-        if (itr->account != paid_creditor)
+        auto balance = get_balance(itr->account);
+        print(" | itr->account != paid_creditor:", itr->account != paid_creditor);
+        print(" | balance.amount >= min_paid_creditor_balance:", balance.amount >= min_paid_creditor_balance);
+        if (itr->account != paid_creditor && balance.amount >= min_paid_creditor_balance)
         {
-          idx.modify(itr, ram_payer, [&](auto &i) {
-            i.is_active = TRUE;
-            i.balance = get_balance(itr->account);
-            i.updated_at = now();
-          });
+          print(" | found a new paid creditor!!!");
+          activate_creditor(itr->account);
           paid_rotated = TRUE;
         }
+        itr++;
       }
-      
     }
   }
 }

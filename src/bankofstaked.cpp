@@ -114,8 +114,11 @@ public:
       depth++;
       itr++;
     }
+    print(117, " before undelegate | ");
     undelegate(order_ids, 0);
+    print(119, " before expire freelock | ");
     expire_freelock();
+    print(119, " before rotate creditor | ");
     rotate_creditor();
   }
 
@@ -255,42 +258,7 @@ public:
   void activate(account_name account)
   {
     require_auth(code_account);
-    creditor_table c(code_account, SCOPE_CREDITOR>>1);
-
-    auto creditor = c.find(account);
-    //make sure specified creditor exists
-    eosio_assert(creditor != c.end(), "account not found in creditor table");
-
-    //activate creditor, deactivate others
-    auto itr = c.end();
-    while (itr != c.begin())
-    {
-      itr--;
-      if (itr->for_free != creditor->for_free)
-      {
-        continue;
-      }
-
-      if(itr->account==creditor->account) {
-        c.modify(itr, ram_payer, [&](auto &i) {
-          i.is_active = TRUE;
-          i.balance = get_balance(itr->account);
-          i.updated_at = now();
-        });
-      }
-      else
-      {
-        if(itr->is_active == FALSE)
-        {
-           continue;
-        }
-        c.modify(itr, ram_payer, [&](auto &i) {
-          i.is_active = FALSE;
-          i.balance = get_balance(itr->account);
-          i.updated_at = now();
-        });
-      }
-    }
+    activate_creditor(account);
   }
 
 
