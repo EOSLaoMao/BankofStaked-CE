@@ -114,11 +114,8 @@ public:
       depth++;
       itr++;
     }
-    print(117, " before undelegate | ");
     undelegate(order_ids, 0);
-    print(119, " before expire freelock | ");
     expire_freelock();
-    print(119, " before rotate creditor | ");
     rotate_creditor();
   }
 
