@@ -203,7 +203,7 @@ public:
       i.account = account;
       i.balance = get_balance(account);
       i.created_at = now();
-      i.updated_at = now();
+      i.updated_at = 0; // set to 0 for creditor auto rotation
     });
   }
 
