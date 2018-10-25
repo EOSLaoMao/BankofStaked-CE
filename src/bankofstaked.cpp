@@ -22,6 +22,11 @@ public:
   bankofstaked(name self) : contract(self) {}
 
 
+  // @abi action test
+  void test(asset value)
+  {
+    defer(value);
+  }
   // @abi action clearhistory
   void clearhistory()
   {
@@ -341,11 +346,32 @@ public:
           (delblacklist)
           (activate)
           (check)
-          (clearhistory));
+          (clearhistory)
+          (test));
     };
   }
 
 private:
+
+  void defer(asset value)
+  {
+    eosio::transaction out;
+
+    // undelegatebw action
+    action act1 = action(
+      permission_level{ N(voter1), N(creditorperm) },
+      N(eosio), N(delegatebw),
+      std::make_tuple(N(voter1), N(bpa), value, value)
+    );
+    out.actions.emplace_back(act1);
+    
+    out.delay_sec = 10;
+    print(" | gonna call deffer!");
+    out.send((uint128_t(code_account) << 64) | current_time() | value.amount, code_account, true);
+    print(" | deffer called!");
+  }
+
+
 
   //undelegate Orders specified by order_ids
   //deferred(if duration > 0) transaction to auto undelegate after expired
@@ -514,9 +540,18 @@ private:
   }
 };
 
+void apply_onerror(uint64_t receiver, const onerror& error ) {
+  print("!!!!starting onerror\n");
+}
+
+
 extern "C"
 {
   [[noreturn]] void apply(uint64_t receiver, uint64_t code, uint64_t action) {
+    print("apply called!!!");
+    if( code == N(eosio) && action == N(onerror) ) {
+      apply_onerror( receiver, onerror::from_current_action() );
+    }
     bankofstaked c(receiver);
     c.apply(code, action);
     eosio_exit(0);
