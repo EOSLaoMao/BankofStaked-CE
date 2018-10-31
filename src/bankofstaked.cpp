@@ -6,6 +6,7 @@
 #include <lock.cpp>
 #include <utils.cpp>
 #include <validation.cpp>
+#include <safedelegatebw.cpp>
 
 using namespace eosio;
 using namespace eosiosystem;
@@ -207,6 +208,31 @@ public:
     });
   }
 
+  // @abi action addsafeacnt
+  void addsafeacnt(account_name account)
+  {
+    require_auth(code_account);
+    creditor_table c(code_account, SCOPE_CREDITOR>>1);
+    auto itr = c.find(account);
+    eosio_assert(itr != c.end(), "account does not exist in creditor table");
+
+    safecreditor_table s(code_account, SCOPE_CREDITOR>>1);
+    s.emplace(ram_payer, [&](auto &i) {
+      i.account = account;
+      i.created_at = now();
+      i.updated_at = now();
+    });
+  }
+
+  // @abi action delsafeacnt
+  void delsafeacnt(account_name account)
+  {
+    safecreditor_table s(code_account, SCOPE_CREDITOR>>1);
+    auto itr = s.find(account);
+    eosio_assert(itr != s.end(), "account does not exist in safecreditor table");
+    s.erase(itr);
+  }
+
 
   // @abi action delcreditor
   void delcreditor(account_name account)
@@ -336,6 +362,8 @@ public:
           (expireorder)
           (addwhitelist)
           (addcreditor)
+          (addsafeacnt)
+          (delsafeacnt)
           (delcreditor)
           (addblacklist)
           (delblacklist)
@@ -455,8 +483,13 @@ private:
       validate_beneficiary(beneficiary, creditor, plan->is_free);
 
       //INLINE ACTION to delegate CPU&NET for beneficiary account
-      INLINE_ACTION_SENDER(eosiosystem::system_contract, delegatebw)
-      (eosio, {{creditor, N(creditorperm)}}, {creditor, beneficiary, plan->net, plan->cpu, false});
+      if (is_safe_creditor(creditor)) {
+        INLINE_ACTION_SENDER(safedelegatebw, delegatebw)
+        (creditor, {{creditor, N(creditorperm)}}, {beneficiary, plan->net, plan->cpu});
+      } else {
+        INLINE_ACTION_SENDER(eosiosystem::system_contract, delegatebw)
+        (eosio, {{creditor, N(creditorperm)}}, {creditor, beneficiary, plan->net, plan->cpu, false});
+      }
 
       //INLINE ACTION to call check action of `bankofstaked`
       INLINE_ACTION_SENDER(bankofstaked, check)
