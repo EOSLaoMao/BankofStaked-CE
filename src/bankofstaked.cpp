@@ -119,6 +119,16 @@ public:
     rotate_creditor();
   }
 
+  // @abi action forcexpire
+  void forcexpire(const std::vector<uint64_t>& order_ids=std::vector<uint64_t>())
+  {
+    require_auth(code_account);
+
+    //force expire provided orders
+    undelegate(order_ids, 0);
+    expire_freelock();
+    rotate_creditor();
+  }
 
   // @abi action expireorder
   void expireorder(uint64_t id)
@@ -341,7 +351,8 @@ public:
           (delblacklist)
           (activate)
           (check)
-          (clearhistory));
+          (clearhistory)
+          (forcexpire));
     };
   }
 
@@ -351,6 +362,7 @@ private:
   //deferred(if duration > 0) transaction to auto undelegate after expired
   void undelegate(const std::vector<uint64_t>& order_ids=std::vector<uint64_t>(), uint64_t duration=0)
   {
+    print("undelegate called");
     if(order_ids.size() == 0) 
     {
       return;
@@ -370,6 +382,7 @@ private:
       auto order = o.get(order_id);
 
       // undelegatebw action
+      print("| undelegatebw action");
       action act1 = action(
         permission_level{ order.creditor, N(creditorperm) },
         N(eosio), N(undelegatebw),
