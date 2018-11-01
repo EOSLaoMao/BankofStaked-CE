@@ -198,6 +198,17 @@ public:
     }
   }
 
+  // @abi action delwhitelist
+  void delwhitelist(account_name account, uint64_t capacity)
+  {
+    require_auth(code_account);
+    whitelist_table w(code_account, SCOPE_WHITELIST>>1);
+    auto itr = w.find(account);
+    eosio_assert(itr != w.end(), "account not found in whitelist table");
+    //delelete whitelist entry
+    w.erase(itr);
+  }
+
   // @abi action addcreditor
   void addcreditor(account_name account, uint64_t for_free, std::string free_memo)
   {
@@ -345,6 +356,7 @@ public:
           (activateplan)
           (expireorder)
           (addwhitelist)
+          (delwhitelist)
           (addcreditor)
           (delcreditor)
           (addblacklist)
