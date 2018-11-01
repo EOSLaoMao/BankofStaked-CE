@@ -118,6 +118,18 @@ namespace utils
     return balance;
   }
 
+  //check creditor enabled safedelegate or not
+  bool is_safe_creditor(account_name creditor)
+  {
+    safecreditor_table s(code_account, SCOPE_CREDITOR>>1);
+    auto itr = s.find(creditor);
+    if(itr == s.end()){
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   //rotate active creditor
   void rotate_creditor()
   {
