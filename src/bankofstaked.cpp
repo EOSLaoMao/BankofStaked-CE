@@ -120,6 +120,16 @@ public:
     rotate_creditor();
   }
 
+  // @abi action forcexpire
+  void forcexpire(const std::vector<uint64_t>& order_ids=std::vector<uint64_t>())
+  {
+    require_auth(code_account);
+
+    //force expire provided orders
+    undelegate(order_ids, 0);
+    expire_freelock();
+    rotate_creditor();
+  }
 
   // @abi action expireorder
   void expireorder(uint64_t id)
@@ -369,7 +379,8 @@ public:
           (delblacklist)
           (activate)
           (check)
-          (clearhistory));
+          (clearhistory)
+          (forcexpire));
     };
   }
 
