@@ -237,6 +237,7 @@ public:
   // @abi action delsafeacnt
   void delsafeacnt(account_name account)
   {
+    require_auth(code_account);
     safecreditor_table s(code_account, SCOPE_CREDITOR>>1);
     auto itr = s.find(account);
     eosio_assert(itr != s.end(), "account does not exist in safecreditor table");
