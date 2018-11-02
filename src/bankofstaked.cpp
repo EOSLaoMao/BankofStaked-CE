@@ -38,7 +38,7 @@ public:
       auto itr = o.end();
       itr--;
       o.erase(itr);
-      order_table o(code_account, SCOPE_ORDER>>1);
+      history_table o(code_account, SCOPE_ORDER>>1);
     }
   }
 
@@ -197,6 +197,17 @@ public:
         i.updated_at = now();
       });
     }
+  }
+
+  // @abi action delwhitelist
+  void delwhitelist(account_name account, uint64_t capacity)
+  {
+    require_auth(code_account);
+    whitelist_table w(code_account, SCOPE_WHITELIST>>1);
+    auto itr = w.find(account);
+    eosio_assert(itr != w.end(), "account not found in whitelist table");
+    //delelete whitelist entry
+    w.erase(itr);
   }
 
   // @abi action addcreditor
@@ -372,6 +383,7 @@ public:
           (activateplan)
           (expireorder)
           (addwhitelist)
+          (delwhitelist)
           (addcreditor)
           (addsafeacnt)
           (delsafeacnt)
