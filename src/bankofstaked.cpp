@@ -38,7 +38,7 @@ public:
       auto itr = o.end();
       itr--;
       o.erase(itr);
-      order_table o(code_account, SCOPE_ORDER>>1);
+      history_table o(code_account, SCOPE_ORDER>>1);
     }
   }
 
