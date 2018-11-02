@@ -111,6 +111,19 @@ typedef multi_index<N(plan), plan,
                     indexed_by<N(price), const_mem_fun<plan, uint64_t, &plan::get_price>>>
     plan_table;
 
+// @abi table safecreditor i64
+struct safecreditor
+{
+  account_name account;
+  uint64_t created_at; // unix time, in seconds
+  uint64_t updated_at; // unix time, in seconds
+
+  account_name primary_key() const { return account; }
+
+  EOSLIB_SERIALIZE(safecreditor, (account)(created_at)(updated_at));
+};
+typedef multi_index<N(safecreditor), safecreditor> safecreditor_table;
+
 // @abi table creditor i64
 struct creditor
 {

@@ -1,8 +1,33 @@
 import pprint
+import time
 from eosapi import Client
 
-
 c = Client(nodes=['https://api.eoslaomao.com'])
+
+def check_order(lower_bound=1):
+    expired_orders = []
+    now = time.time()
+    new_lower_bound = lower_bound
+    r = c.get_table_rows(**{"code": "bankofstaked", "scope": "921459758687", "table": "order", "json": True, "limit": 10000, "upper_bound": None, "lower_bound": lower_bound, "table_key": "id"})
+    more = r["more"]
+    count = 0
+    free_count = 0
+    for line in r["rows"]:
+        if line["expire_at"] < now:
+            expired_orders.append(line)
+            count+=1
+            print(line)
+            if line["is_free"]:
+                #print("free id:", line["id"])
+                free_count += 1
+        if line["id"] > lower_bound:
+            new_lower_bound = line["id"]
+    print("expired orders: %d" % count)
+    print("expired free orders: %d" % free_count)
+    return more, new_lower_bound, expired_orders
+
+
+
 def fetch_creditors():
     paid_accounts = []
     free_accounts = []
@@ -43,6 +68,30 @@ def get_account(a, free=True):
 
 
 if __name__ == "__main__":
+    bps = set()
+    def get_name(d):
+        """ Return the value of a key in a dictionary. """
+        return d["expire_at"]
+
+    expired = []
+    more, lower_bound, expired_orders = check_order()
+    expired.extend(expired_orders)
+    while more:
+        more, lower_bound, expired_orders = check_order(lower_bound=lower_bound)
+        expired.extend(expired_orders)
+
+    expired.sort(key=get_name)
+    ids = []
+    for e in expired:
+        bps.add(e["creditor"]);
+        if(e["creditor"] == 'stakingfundh'):
+            print(e)
+            ids.append(e["id"])
+        #print(e["id"], (e["expire_at"]-time.time())/3600, (e["expire_at"]-e["created_at"])/3600.)
+    print(bps)
+    ids.reverse()
+    print(ids[:100])
+    '''
     refundings = []
     free_accounts, paid_accounts = fetch_creditors()
     print("=================FREE ACCOUNTS==================")
@@ -57,3 +106,4 @@ if __name__ == "__main__":
 
     for r in refundings:
         print(r)
+    '''
