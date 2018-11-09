@@ -118,6 +118,6 @@ namespace validation
     eosio_assert(price.is_valid(), "invalid price");
     eosio_assert(cpu.is_valid(), "invalid cpu");
     eosio_assert(net.is_valid(), "invalid net");
-    eosio_assert(price.amount >= 100 && price.amount <= 1000000, "price should between 0.01 EOS and 100 EOS");
+    eosio_assert(price.amount >= 100 && price.amount <= 10000000, "price should between 0.01 EOS and 1000 EOS");
   }
 }
