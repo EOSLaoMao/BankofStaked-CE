@@ -9,7 +9,7 @@ Input parameters:
 * `capacity` (number of orders for this account)
 
 ### Intent
-INTENT. The main purpose of this action is to delete an account to whitelist table.
+INTENT. The purpose of this action is to delete an account to whitelist table.
 
 ### Term
 TERM. This Contract expires at the conclusion of code execution.
