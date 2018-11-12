@@ -63,11 +63,14 @@ def get_account(a, free=True):
         ram_required = balance * 0.16
     else:
         ram_required = balance * 0.12 / 30.
-    print(r["account_name"], liquid_balance)
-    print(r["account_name"], "%.4f EOS" % balance, "%.2f" % (ram_quota/1024.), "%.2f" % ram_required, ram_quota/1024. > ram_required)
+    #print(r["account_name"], liquid_balance)
+    row = " | ".join([r["account_name"], str("%.4f EOS" % balance), str("%.2f" % (ram_quota/1024.)), str("%.2f" % ram_required), "✅" if (ram_quota/1024. > ram_required) else "❌"])
+    row = "| %s |" % row
+    print(row)
 
 
 if __name__ == "__main__":
+    '''
     bps = set()
     def get_name(d):
         """ Return the value of a key in a dictionary. """
@@ -95,15 +98,18 @@ if __name__ == "__main__":
     refundings = []
     free_accounts, paid_accounts = fetch_creditors()
     print("=================FREE ACCOUNTS==================")
+    print("| Account | Balance | RAM Owned(kb) | RAM Requird(kb) | Enough RAM? |")
+    print("| ------- | ------- | --------- | ----------- | ----------- |")
     for account in free_accounts:
         get_account(account)
     print("================================================\n\n")
 
     print("=================PAID ACCOUNTS==================")
+    print("| Account | Balance | RAM Owned(kb) | RAM Requird(kb) | Enough RAM? |")
+    print("| ------- | ------- | --------- | ----------- | ----------- |")
     for account in paid_accounts:
         get_account(account, False)
     print("================================================")
 
     for r in refundings:
         print(r)
-    '''
