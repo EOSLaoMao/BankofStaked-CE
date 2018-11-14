@@ -24,7 +24,7 @@ public:
 
 
   // @abi action clearhistory
-  void clearhistory()
+  void clearhistory(uint64_t max_depth)
   {
     require_auth(code_account);
     uint64_t depth = 0;
@@ -32,7 +32,7 @@ public:
     while (o.begin() != o.end())
     {
       depth += 1;
-      if(depth >100) {
+      if(depth > max_depth) {
         break;
       }
       auto itr = o.end();
