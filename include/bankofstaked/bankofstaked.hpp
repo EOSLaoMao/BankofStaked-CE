@@ -14,6 +14,7 @@ namespace bank
 static const account_name code_account = N(bankofstaked);
 static const account_name ram_payer = N(bankofstaked);
 static const account_name safe_transfer_account = N(masktransfer);
+static const account_name reserved_account = N(stakedincome);
 static const uint64_t SECONDS_PER_MIN = 60;
 static const uint64_t SECONDS_PER_DAY = 24 * 3600;
 static const uint64_t MAX_FREE_ORDERS = 5;
@@ -23,6 +24,7 @@ static const uint64_t FALSE = 0;
 static const uint64_t CHECK_MAX_DEPTH = 3;
 static const uint64_t MAX_EOS_BALANCE = 500 * 10000; // 500 EOS at most
 static const uint64_t MIN_FREE_CREDITOR_BALANCE = 10 * 10000; // 10 EOS at least
+static const uint64_t DEFAULT_DIVIDENT_PERCENTAGE = 90; // 90% income will be allocated to creditor
 
 // To protect your table, you can specify different scope as random numbers
 static const uint64_t SCOPE_ORDER = 1842919517374;
@@ -123,6 +125,18 @@ struct safecreditor
   EOSLIB_SERIALIZE(safecreditor, (account)(created_at)(updated_at));
 };
 typedef multi_index<N(safecreditor), safecreditor> safecreditor_table;
+
+// @abi table dividend i64
+struct dividend 
+{
+  account_name account;
+  uint64_t percentage; // percentage of income allocating to creditor
+
+  account_name primary_key() const { return account; }
+
+  EOSLIB_SERIALIZE(dividend, (account)(percentage));
+};
+typedef multi_index<N(dividend), dividend> dividend_table;
 
 // @abi table creditor i64
 struct creditor

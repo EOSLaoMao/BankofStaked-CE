@@ -444,12 +444,30 @@ private:
         auto username = name{order.creditor};
         std::string recipient_name = username.to_string();
         std::string memo = recipient_name + " bankofstaked income";
+
+        // transfer income to creditor
+        asset income = get_income(order.creditor, order.price);
+        eosio_assert(income <= order.price, "income should not be greater than price");
         action act3 = action(
           permission_level{ code_account, N(bankperm) },
           N(eosio.token), N(transfer),
-          std::make_tuple(code_account, safe_transfer_account, order.price, memo)
+          std::make_tuple(code_account, safe_transfer_account, income, memo)
         );
         out.actions.emplace_back(act3);
+
+        // transfer reserved fund to reserved_account
+        asset reserved = order.price - income;
+        eosio_assert(reserved <= order.price, "reserved should not be greater than price");
+        username = name{reserved_account};
+        recipient_name = username.to_string();
+        memo = recipient_name + " bankofstaked reserved";
+        action act4 = action(
+          permission_level{ code_account, N(bankperm) },
+          N(eosio.token), N(transfer),
+          std::make_tuple(code_account, safe_transfer_account, reserved, memo)
+        );
+        out.actions.emplace_back(act4);
+
       }
     }
 
