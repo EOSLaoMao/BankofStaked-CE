@@ -510,7 +510,11 @@ private:
 
       //get creditor
       account_name creditor = get_active_creditor(plan->is_free);
-
+      asset to_delegate = plan->cpu + plan->net;
+      if(get_balance(creditor) < to_delegate) {
+        creditor = get_qualified_creditor(plan->is_free, to_delegate);
+      }
+      eosio_assert( is_account( creditor ), "creditor account does not exist");
 
       //validate buyer
       //1. buyer shouldnt be code_account
