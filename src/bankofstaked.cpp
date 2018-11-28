@@ -508,12 +508,19 @@ private:
         validate_freelock(beneficiary);
       }
 
-      //get creditor
+      //get active creditor
       account_name creditor = get_active_creditor(plan->is_free);
-      asset to_delegate = plan->cpu + plan->net;
-      if(get_balance(creditor) < to_delegate) {
-        creditor = get_qualified_creditor(plan->is_free, to_delegate);
+
+      //if plan is not free, make sure creditor has enough balance to delegate
+      if(plan->is_free == FALSE)
+      {
+          asset to_delegate = plan->cpu + plan->net;
+          if(get_balance(creditor) < to_delegate) {
+            creditor = get_qualified_paid_creditor(to_delegate);
+          }
       }
+
+      //make sure creditor is a valid account
       eosio_assert( is_account( creditor ), "creditor account does not exist");
 
       //validate buyer

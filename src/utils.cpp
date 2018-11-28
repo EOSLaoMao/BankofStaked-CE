@@ -60,7 +60,7 @@ namespace utils
   }
 
   //get creditor with balance >= to_delegate
-  account_name get_qualified_creditor(uint64_t for_free, asset to_delegate)
+  account_name get_qualified_paid_creditor(asset to_delegate)
   {
     uint64_t active = TRUE;
     creditor_table c(code_account, SCOPE_CREDITOR>>1);
@@ -69,7 +69,7 @@ namespace utils
     account_name creditor;
     while (itr != idx.end())
     {
-      if(itr->for_free == for_free && get_balance(itr->account) >= to_delegate) {
+      if(itr->for_free == FALSE && get_balance(itr->account) >= to_delegate) {
         creditor = itr->account;
         break;
       }
