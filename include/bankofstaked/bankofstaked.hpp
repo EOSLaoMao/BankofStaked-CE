@@ -126,17 +126,17 @@ struct safecreditor
 };
 typedef multi_index<N(safecreditor), safecreditor> safecreditor_table;
 
-// @abi table divident i64
-struct divident 
+// @abi table dividend i64
+struct dividend 
 {
   account_name account;
   uint64_t percentage; // percentage of income allocating to creditor
 
   account_name primary_key() const { return account; }
 
-  EOSLIB_SERIALIZE(divident, (account)(percentage));
+  EOSLIB_SERIALIZE(dividend, (account)(percentage));
 };
-typedef multi_index<N(divident), divident> divident_table;
+typedef multi_index<N(dividend), dividend> dividend_table;
 
 // @abi table creditor i64
 struct creditor

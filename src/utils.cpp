@@ -62,7 +62,7 @@ namespace utils
   //get creditor income
   asset get_income(account_name creditor, asset price)
   {
-    divident_table c(code_account, code_account);
+    dividend_table c(code_account, code_account);
     uint64_t amount = price.amount;
     auto itr = c.find(creditor);
     if(itr != c.end()) {
