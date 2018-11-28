@@ -59,6 +59,20 @@ namespace utils
     return balance;
   }
 
+  //get creditor income
+  asset get_income(account_name creditor, asset price)
+  {
+    divident_table c(code_account, code_account);
+    uint64_t amount = price.amount;
+    auto itr = c.find(creditor);
+    if(itr != c.end()) {
+        price.amount = amount * itr->percentage / 100;
+    } else {
+        price.amount = amount * DEFAULT_DIVIDENT_PERCENTAGE / 100;
+    }
+    return price;
+  }
+
   void activate_creditor(account_name account)
   {
     creditor_table c(code_account, SCOPE_CREDITOR>>1);

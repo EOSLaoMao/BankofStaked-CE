@@ -4,6 +4,8 @@ cleos -u $API system newaccount voter3 bankofstaked EOS6MRyAjQq8ud7hVNYcfnVPJqcV
 sleep 1
 cleos -u $API set contract bankofstaked bankofstaked
 sleep 1
+cleos -u $API system newaccount voter3 stakedincome EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV --buy-ram "100 EOS" --stake-cpu "100 EOS" --stake-net "100 EOS"
+sleep 1
 cleos -u $API system newaccount voter3 masktransfer EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV --buy-ram "100 EOS" --stake-cpu "100 EOS" --stake-net "100 EOS"
 sleep 1
 
