@@ -120,4 +120,12 @@ namespace validation
     eosio_assert(net.is_valid(), "invalid net");
     eosio_assert(price.amount >= 100 && price.amount <= 10000000, "price should between 0.01 EOS and 1000 EOS");
   }
+
+  //validate account exist in creditor table
+  void validate_creditor(account_name creditor)
+  {
+    creditor_table c(code_account, SCOPE_CREDITOR>>1);
+    auto itr = c.find(creditor);
+    eosio_assert(itr != c.end(), "account does not exist in creditor table");
+  }
 }

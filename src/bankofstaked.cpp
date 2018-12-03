@@ -99,6 +99,8 @@ public:
   {
     require_auth(code_account);
 
+    validate_creditor(creditor);
+
     order_table o(code_account, SCOPE_ORDER>>1);
     uint64_t depth = 0;
     std::vector<uint64_t> order_ids;
@@ -236,9 +238,8 @@ public:
   void addsafeacnt(account_name account)
   {
     require_auth(code_account);
-    creditor_table c(code_account, SCOPE_CREDITOR>>1);
-    auto itr = c.find(account);
-    eosio_assert(itr != c.end(), "account does not exist in creditor table");
+
+    validate_creditor(account);
 
     safecreditor_table s(code_account, SCOPE_CREDITOR>>1);
     s.emplace(ram_payer, [&](auto &i) {
