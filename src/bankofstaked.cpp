@@ -95,9 +95,11 @@ public:
 
 
   // @abi action check
-  void check()
+  void check(account_name creditor)
   {
     require_auth(code_account);
+
+    validate_creditor(creditor);
 
     order_table o(code_account, SCOPE_ORDER>>1);
     uint64_t depth = 0;
@@ -118,6 +120,7 @@ public:
     undelegate(order_ids, 0);
     expire_freelock();
     rotate_creditor();
+    get_balance(creditor);
   }
 
   // @abi action forcexpire
@@ -157,12 +160,13 @@ public:
     // updated cpu_staked/net_staked/cpu_unstaked/net_unstaked of creditor entry
     creditor_table c(code_account, SCOPE_CREDITOR>>1);
     auto creditor_itr = c.find(order->creditor);
+    asset balance = get_balance(order->creditor);
     c.modify(creditor_itr, ram_payer, [&](auto &i) {
       i.cpu_staked -= order->cpu_staked;
       i.net_staked -= order->net_staked;
       i.cpu_unstaked += order->cpu_staked;
       i.net_unstaked += order->net_staked;
-      i.balance = get_balance(order->creditor);
+      i.balance = balance;
       i.updated_at = now();
     });
 
@@ -218,12 +222,13 @@ public:
     auto itr = c.find(account);
     eosio_assert(itr == c.end(), "account already exist in creditor table");
 
+    asset balance = get_balance(account);
     c.emplace(ram_payer, [&](auto &i) {
       i.is_active = FALSE;
       i.for_free = for_free?TRUE:FALSE;
       i.free_memo = for_free?free_memo:"";
       i.account = account;
-      i.balance = get_balance(account);
+      i.balance = balance;
       i.created_at = now();
       i.updated_at = 0; // set to 0 for creditor auto rotation
     });
@@ -233,9 +238,8 @@ public:
   void addsafeacnt(account_name account)
   {
     require_auth(code_account);
-    creditor_table c(code_account, SCOPE_CREDITOR>>1);
-    auto itr = c.find(account);
-    eosio_assert(itr != c.end(), "account does not exist in creditor table");
+
+    validate_creditor(account);
 
     safecreditor_table s(code_account, SCOPE_CREDITOR>>1);
     s.emplace(ram_payer, [&](auto &i) {
@@ -508,9 +512,21 @@ private:
         validate_freelock(beneficiary);
       }
 
-      //get creditor
+      //get active creditor
       account_name creditor = get_active_creditor(plan->is_free);
 
+      //if plan is not free, make sure creditor has enough balance to delegate
+      if(plan->is_free == FALSE)
+      {
+          asset to_delegate = plan->cpu + plan->net;
+          asset balance = get_balance(creditor);
+          if(balance < to_delegate) {
+            creditor = get_qualified_paid_creditor(to_delegate);
+          }
+      }
+
+      //make sure creditor is a valid account
+      eosio_assert( is_account( creditor ), "creditor account does not exist");
 
       //validate buyer
       //1. buyer shouldnt be code_account
@@ -535,15 +551,16 @@ private:
 
       //INLINE ACTION to call check action of `bankofstaked`
       INLINE_ACTION_SENDER(bankofstaked, check)
-      (code_account, {{code_account, N(bankperm)}}, {});
+      (code_account, {{code_account, N(bankperm)}}, {creditor});
 
       // add cpu_staked&net_staked to creditor entry
+      asset balance = get_balance(creditor);
       creditor_table c(code_account, SCOPE_CREDITOR>>1);
       auto creditor_itr = c.find(creditor);
       c.modify(creditor_itr, ram_payer, [&](auto &i) {
         i.cpu_staked += plan->cpu;
         i.net_staked += plan->net;
-        i.balance = get_balance(creditor);
+        i.balance = balance;
         i.updated_at = now();
       });
 

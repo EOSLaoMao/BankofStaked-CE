@@ -59,6 +59,26 @@ namespace utils
     return balance;
   }
 
+  //get creditor with balance >= to_delegate
+  account_name get_qualified_paid_creditor(asset to_delegate)
+  {
+    uint64_t active = TRUE;
+    creditor_table c(code_account, SCOPE_CREDITOR>>1);
+    auto idx = c.get_index<N(is_active)>();
+    auto itr = idx.begin();
+    account_name creditor;
+    while (itr != idx.end())
+    {
+      asset balance = get_balance(itr->account);
+      if(itr->for_free == FALSE && balance >= to_delegate) {
+        creditor = itr->account;
+        break;
+      }
+      itr++;
+    }
+    return creditor;
+  }
+
   //get creditor income
   asset get_income(account_name creditor, asset price)
   {
