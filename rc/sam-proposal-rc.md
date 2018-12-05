@@ -2,13 +2,13 @@
 
 ## Preamble
 
-The EOS Mainnet is a wonderful tool for the world to use in commercial applications; there are however some complications that may arise from its resource allocation and planning.
+EOS is a wonderful tool for the world to use in commercial applications; there are however some complications that may arise from its resource allocation and planning.
 
-BankofStaked aims to help by providing an automated service for resource allocation within the EOS Mainnet in exchange for fixed costs over a predefined duration.
+BankofStaked aims to help by providing an automated service for resource allocation within EOS in exchange for fixed costs over a predefined duration.
 
 ## Executive Summary
 
-BankofStaked provides the workflow to arrange Creditor to temporarily delegate staked resources to Beneficiary in exchange for a Fee.
+BankofStaked provides the workflow to arrange Creditor to temporarily delegate resources to Beneficiary in exchange for a Fee.
 
 ## Language and Interpretation
 
@@ -17,18 +17,22 @@ The operative language is English.
 ## Definitions
 
  * Beneficiary: the person who is recipient of delegation.
- * Creditor: the person who makes stake available for delegation.
+ * Chain: the chain with the ID `aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906`.
+ * Creditor: the person who makes resources available for delegation.
  * Delegation: the assignment of resources from Creditor to Beneficiary.
  * Fee: tokens transfered into BankofStaked that exactly correspond to a fee schedule amount.
  * Fee Schedule: the list of services provided with their corresponding amount.
- * Stake: the token which a Creditor makes available for delegation.
 
 ## Roles
 
 This smart contract defines the following roles:
 1. Code: the account that manages this contract
-1. Creditor: any account that makes stake available for delegation
+1. Creditor: any account that grants Code delegate/undelegate permission on some of its token
 1. Beneficiary: any account that pays fee in order to receive delegation
+
+## Scope
+
+This contract applies to Chain, with the ID as defined above. Each chain may have its own operative version of this contract. Each chain's contract is severable and independent.
 
 ## Acceptance
 
@@ -38,44 +42,67 @@ Any party making use or taking benefit from this contract is considered to agree
 
 ### Obligations
 
-1. On a best effort basis, Code is responsible for maintaining this contract's operational status.
-1. On a best effort basis, Code aims to grant delegation to beneficiary resources as per Fee Schedule.
-1. On a best effort basis, Code aims to return funds transfered to this contract which does not match Fee Schedule.
-1. On a best effort basis, Code aims to release delegation upon expiry.
+On a best effort basis, Code aims to:
+1. maintain this contract's operational status.
+1. grant delegation to beneficiary resources as per Fee Schedule.
+1. return funds transfered to this contract which does not match Fee Schedule.
+1. release delegation upon expiry.
+1. to distribute 90% of the fee to Creditor whose token was invovled in a delegation.
 
 ### Rights
 
-1. Reserves the right to update the terms of Fee Schedule without notice nor justification.
-1. Code reserves the right to revoke delegation to any beneficiary for violation of terms set forth herein.
+Code reserves the right to:
+1. update the terms of Fee Schedule without notice nor justification.
+1. revoke delegation to any beneficiary for violation of terms set forth herein.
+1. decline service to any beneficiary without notice nor justification.
 
 ## Role: Creditor
 
 ### Obligations
 
-Creditor pledges to [...]
+1. Creditor agrees to refrain from revoking delegate/undelegate permission without submitting Code 3 days' prior notice, as per Communications Protocols defined herein.
+   1. Failure to provide proper notice before revoking delegate/undelegate permission, resulting in interruption of service for Beneficiary, Creditor forfeits his right to proceeds from the fees.
+1. All communications intended for Code are to be sent as per Communications Protocol prescribed below.
 
 ### Rights
 
-Creditor may reserve the right to [...]
+1. Creditor has a right to 90% of proceeds from the fees accrued by a delegation at the time of release.
 
 ## Role: Beneficiary
 
 ### Obligations
 
-1. Beneficiary must not submit unreasonable amounts of orders.
+1. To refrain from submitting an unreasonable amount of requests.
+1. All communications intended for Code are to be sent as per Communications Protocol prescribed below.
 
+### Rights
+
+1. For duly submitted fees resulting in a delegation order, Beneficiary may have an expectation of maintenance of delegation.
+1. Beneficiaries who suffer an interruption of delegation may claim either: (i) a refund, or (ii) credit toward a delegation of equal value.
+
+## Communications Protocol
+
+All notices under this contract intended for Code, must be sent by email to the following address: `bos@eoslaomao.com`
+   
 ## Force Majeure
 
-In any event outside of BankofStaked's ability to control or influence, BankofStaked is not liable for any failure to perform as a result of said event. This may include--without limitation--an interruption of service of the EOS Main Net or the Internet.
+In any event outside of BankofStaked's ability to control or influence, BankofStaked is not liable for any failure to perform as a result of said event.
+
+This may include--without limitation:
+ * an interruption of service of the EOS Chain;
+ * hacking/compromise of BankofStaked or Code account;
+ * natural disater or act of God.
 
 ## Fee Schedule
 
-| Package | Amount | RAM | Bandwidth | Duration |
-|---|---|---|---|---|
-| Free Plan | 0 | 0.8 | 0.2 | 8 hours |
-| Micro | 0.2 | 55 | 5 | 7 days |
-| Mini | 0.5 | 165 | 15 | 7 days |
-| Short | 1.0 | 330 | 20 | 7 days |
-| Tall | 2.0 | 700 | 50 | 7 days |
+| Package | Amount | RAM | Bandwidth | Duration | Note |
+|---|---|---|---|---|---|
+| Free Plan | 0 | 0.8 | 0.2 | 8 hours | Available once per 24 hours |
+| Micro | 0.2 | 55 | 5 | 7 days | |
+| Mini | 0.5 | 165 | 15 | 7 days | |
+| Short | 1.0 | 330 | 20 | 7 days | |
+| Tall | 2.0 | 700 | 50 | 7 days | |
+| Mercury | 80 | 9900 | 100 | 28 days | |
+| Gemini | 300 | 45000 | 5000 | 28 days | |
 
 Note: all amounts set in Fee Schedule are denominated in EOS token.
