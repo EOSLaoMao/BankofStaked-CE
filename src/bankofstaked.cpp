@@ -93,6 +93,26 @@ public:
     */
   }
 
+  // @abi action test
+  void test(account_name creditor)
+  {
+    require_auth(code_account);
+
+    validate_creditor(creditor);
+
+    //INLINE ACTION to test delegate CPU&NET for creditor itself
+    if (is_safe_creditor(creditor)) {
+      INLINE_ACTION_SENDER(safedelegatebw, delegatebw)
+      (creditor, {{creditor, N(creditorperm)}}, {creditor, plan->net, plan->cpu});
+    } else {
+      INLINE_ACTION_SENDER(eosiosystem::system_contract, delegatebw)
+      (eosio, {{creditor, N(creditorperm)}}, {creditor, creditor, plan->net, plan->cpu, false});
+    }
+
+    INLINE_ACTION_SENDER(eosiosystem::system_contract, undelegatebw)
+    (eosio, {{creditor, N(creditorperm)}}, {creditor, creditor, plan->net, plan->cpu});
+
+  }
 
   // @abi action check
   void check(account_name creditor)
