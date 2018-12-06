@@ -100,17 +100,21 @@ public:
 
     validate_creditor(creditor);
 
+    plan_table p(code_account, code_account);
+    auto idx = p.get_index<N(price)>();
+    auto plan = idx.find(FREE_PLAN_AMOUNT);
+
     //INLINE ACTION to test delegate CPU&NET for creditor itself
     if (is_safe_creditor(creditor)) {
       INLINE_ACTION_SENDER(safedelegatebw, delegatebw)
       (creditor, {{creditor, N(creditorperm)}}, {creditor, plan->net, plan->cpu});
     } else {
       INLINE_ACTION_SENDER(eosiosystem::system_contract, delegatebw)
-      (eosio, {{creditor, N(creditorperm)}}, {creditor, creditor, plan->net, plan->cpu, false});
+      (EOSIO, {{creditor, N(creditorperm)}}, {creditor, creditor, plan->net, plan->cpu, false});
     }
 
     INLINE_ACTION_SENDER(eosiosystem::system_contract, undelegatebw)
-    (eosio, {{creditor, N(creditorperm)}}, {creditor, creditor, plan->net, plan->cpu});
+    (EOSIO, {{creditor, N(creditorperm)}}, {creditor, creditor, plan->net, plan->cpu});
 
   }
 
@@ -416,6 +420,7 @@ public:
           (delblacklist)
           (activate)
           (check)
+          (test)
           (clearhistory)
           (forcexpire));
     };
@@ -524,7 +529,6 @@ private:
       eosio_assert(plan != idx.end(), "invalid price");
 
       account_name beneficiary = get_beneficiary(t.memo, buyer);
-      account_name eosio = string_to_name("eosio");
 
       // if plan is free, validate there is no Freelock for this beneficiary
       if(plan->is_free == TRUE)
@@ -566,7 +570,7 @@ private:
         (creditor, {{creditor, N(creditorperm)}}, {beneficiary, plan->net, plan->cpu});
       } else {
         INLINE_ACTION_SENDER(eosiosystem::system_contract, delegatebw)
-        (eosio, {{creditor, N(creditorperm)}}, {creditor, beneficiary, plan->net, plan->cpu, false});
+        (EOSIO, {{creditor, N(creditorperm)}}, {creditor, beneficiary, plan->net, plan->cpu, false});
       }
 
       //INLINE ACTION to call check action of `bankofstaked`
