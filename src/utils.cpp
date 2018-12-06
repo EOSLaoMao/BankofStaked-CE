@@ -88,7 +88,7 @@ namespace utils
     if(itr != c.end()) {
         price.amount = amount * itr->percentage / 100;
     } else {
-        price.amount = amount * DEFAULT_DIVIDENT_PERCENTAGE / 100;
+        price.amount = amount * DEFAULT_DIVIDEND_PERCENTAGE / 100;
     }
     return price;
   }
