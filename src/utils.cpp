@@ -101,13 +101,13 @@ namespace utils
     //make sure specified creditor exists
     eosio_assert(creditor != c.end(), "account not found in creditor table");
 
+    eosio::transaction out;
     //activate creditor, deactivate others
     auto itr = c.end();
     while (itr != c.begin())
     {
       itr--;
-      if (itr->for_free != creditor->for_free)
-      {
+      if (itr->for_free != creditor->for_free) {
         continue;
       }
 
@@ -117,11 +117,15 @@ namespace utils
           i.balance = get_balance(itr->account);
           i.updated_at = now();
         });
-      }
-      else
-      {
-        if(itr->is_active == FALSE)
-        {
+        action act1 = action(
+          permission_level{ CODE_ACCOUNT, N(bankperm) },
+          CODE_ACCOUNT,
+          N(rotate),
+          std::make_tuple(itr->account, itr->for_free)
+        );
+        out.actions.emplace_back(act1);
+      } else {
+        if(itr->is_active == FALSE) {
            continue;
         }
         c.modify(itr, RAM_PAYER, [&](auto &i) {
@@ -131,6 +135,7 @@ namespace utils
         });
       }
     }
+    out.send((uint128_t(CODE_ACCOUNT) << 64) | current_time(), CODE_ACCOUNT, true);
   }
 
   //get min paid creditor balance

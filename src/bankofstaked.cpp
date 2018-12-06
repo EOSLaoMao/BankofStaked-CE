@@ -118,6 +118,14 @@ public:
 
   }
 
+  // @abi action rotate
+  void rotate(account_name creditor, uint64_t for_free)
+  {
+    require_auth(CODE_ACCOUNT);
+
+    validate_creditor(creditor);
+  }
+
   // @abi action check
   void check(account_name creditor)
   {
@@ -421,6 +429,7 @@ public:
           (activate)
           (check)
           (test)
+          (rotate)
           (clearhistory)
           (forcexpire));
     };
