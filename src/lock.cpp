@@ -7,8 +7,8 @@ namespace lock
   //add freelock entry
   void add_freelock(account_name beneficiary)
   {
-    freelock_table f(code_account, SCOPE_FREELOCK>>1);
-    f.emplace(ram_payer, [&](auto &i) {
+    freelock_table f(CODE_ACCOUNT, SCOPE);
+    f.emplace(RAM_PAYER, [&](auto &i) {
       i.beneficiary = beneficiary;
       i.created_at = now();
       i.expire_at = i.created_at + SECONDS_PER_DAY;
@@ -20,7 +20,7 @@ namespace lock
   {
     uint64_t depth = 0;
     uint64_t n = now();
-    freelock_table f(code_account, SCOPE_FREELOCK>>1);
+    freelock_table f(CODE_ACCOUNT, SCOPE);
     auto idx = f.get_index<N(expire_at)>();
     auto last = idx.upper_bound(n);
     auto itr = idx.lower_bound(0);

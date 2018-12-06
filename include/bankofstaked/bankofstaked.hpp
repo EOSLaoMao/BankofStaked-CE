@@ -11,10 +11,12 @@ using namespace eosio;
 
 namespace bank
 {
-static const account_name code_account = N(bankofstaked);
-static const account_name ram_payer = N(bankofstaked);
-static const account_name safe_transfer_account = N(masktransfer);
-static const account_name reserved_account = N(stakedincome);
+static const account_name CODE_ACCOUNT = N(bankofstaked);
+static const account_name RAM_PAYER = N(bankofstaked);
+static const account_name MASK_TRANSFER = N(masktransfer);
+static const account_name STAKED_INCOME = N(stakedincome);
+static const account_name EOSIO = string_to_name("eosio");
+static const uint64_t FREE_PLAN_AMOUNT = 1000;
 static const uint64_t SECONDS_PER_MIN = 60;
 static const uint64_t SECONDS_PER_DAY = 24 * 3600;
 static const uint64_t MAX_FREE_ORDERS = 5;
@@ -24,15 +26,10 @@ static const uint64_t FALSE = 0;
 static const uint64_t CHECK_MAX_DEPTH = 3;
 static const uint64_t MAX_EOS_BALANCE = 500 * 10000; // 500 EOS at most
 static const uint64_t MIN_FREE_CREDITOR_BALANCE = 10 * 10000; // 10 EOS at least
-static const uint64_t DEFAULT_DIVIDENT_PERCENTAGE = 90; // 90% income will be allocated to creditor
+static const uint64_t DEFAULT_DIVIDEND_PERCENTAGE = 90; // 90% income will be allocated to creditor
 
 // To protect your table, you can specify different scope as random numbers
-static const uint64_t SCOPE_ORDER = 1842919517374;
-static const uint64_t SCOPE_HISTORY = 1842919517374;
-static const uint64_t SCOPE_CREDITOR = 1842919517374;
-static const uint64_t SCOPE_FREELOCK = 1842919517374;
-static const uint64_t SCOPE_BLACKLIST = 1842919517374;
-static const uint64_t SCOPE_WHITELIST = 1842919517374;
+static const uint64_t SCOPE = 921459758687;
 
 // @abi table freelock i64
 struct freelock
