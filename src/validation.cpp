@@ -8,7 +8,7 @@ namespace validation
   // check freelock
   void validate_freelock(account_name beneficiary)
   {
-    freelock_table f(CODE_ACCOUNT, SCOPE_FREELOCK>>1);
+    freelock_table f(CODE_ACCOUNT, SCOPE);
     auto itr = f.find(beneficiary);
     eosio_assert(itr == f.end(), "free plan is avaliable every 24 hours for each beneficiary");
   }
@@ -16,7 +16,7 @@ namespace validation
   // check blacklist
   void validate_blacklist(account_name account)
   {
-    blacklist_table b(CODE_ACCOUNT, SCOPE_BLACKLIST>>1);
+    blacklist_table b(CODE_ACCOUNT, SCOPE);
     auto itr = b.find(account);
     eosio_assert(itr == b.end(), "something wrong with your account");
   }
@@ -25,7 +25,7 @@ namespace validation
   uint64_t get_free_order_cap(account_name buyer)
   {
     uint64_t max_orders = MAX_FREE_ORDERS;
-    whitelist_table w(CODE_ACCOUNT, SCOPE_WHITELIST>>1);
+    whitelist_table w(CODE_ACCOUNT, SCOPE);
     auto itr = w.find(buyer);
     if(itr != w.end())
     {
@@ -51,7 +51,7 @@ namespace validation
     std::string suffix = " affective orders at most for each buyer";
     std::string error_msg = std::to_string(max_orders) + suffix;
 
-    order_table o(CODE_ACCOUNT, SCOPE_ORDER>>1);
+    order_table o(CODE_ACCOUNT, SCOPE);
     auto idx = o.get_index<N(buyer)>();
     auto first = idx.lower_bound(buyer);
     auto last = idx.upper_bound(buyer);
@@ -91,7 +91,7 @@ namespace validation
     eosio_assert(balance.amount<MAX_EOS_BALANCE, "beneficiary should have no more than 500 EOS");
     */
 
-    order_table o(CODE_ACCOUNT, SCOPE_ORDER>>1);
+    order_table o(CODE_ACCOUNT, SCOPE);
     auto idx = o.get_index<N(beneficiary)>();
     auto first = idx.lower_bound(beneficiary);
     auto last = idx.upper_bound(beneficiary);
@@ -124,7 +124,7 @@ namespace validation
   //validate account exist in creditor table
   void validate_creditor(account_name creditor)
   {
-    creditor_table c(CODE_ACCOUNT, SCOPE_CREDITOR>>1);
+    creditor_table c(CODE_ACCOUNT, SCOPE);
     auto itr = c.find(creditor);
     eosio_assert(itr != c.end(), "account does not exist in creditor table");
   }

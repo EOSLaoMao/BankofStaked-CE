@@ -29,12 +29,7 @@ static const uint64_t MIN_FREE_CREDITOR_BALANCE = 10 * 10000; // 10 EOS at least
 static const uint64_t DEFAULT_DIVIDENT_PERCENTAGE = 90; // 90% income will be allocated to creditor
 
 // To protect your table, you can specify different scope as random numbers
-static const uint64_t SCOPE_ORDER = 1842919517374;
-static const uint64_t SCOPE_HISTORY = 1842919517374;
-static const uint64_t SCOPE_CREDITOR = 1842919517374;
-static const uint64_t SCOPE_FREELOCK = 1842919517374;
-static const uint64_t SCOPE_BLACKLIST = 1842919517374;
-static const uint64_t SCOPE_WHITELIST = 1842919517374;
+static const uint64_t SCOPE = 921459758687;
 
 // @abi table freelock i64
 struct freelock
