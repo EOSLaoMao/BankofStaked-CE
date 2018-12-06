@@ -26,9 +26,9 @@ public:
   // @abi action clearhistory
   void clearhistory(uint64_t max_depth)
   {
-    require_auth(code_account);
+    require_auth(CODE_ACCOUNT);
     uint64_t depth = 0;
-    history_table o(code_account, SCOPE_ORDER>>1);
+    history_table o(CODE_ACCOUNT, SCOPE_ORDER>>1);
     while (o.begin() != o.end())
     {
       depth += 1;
@@ -38,7 +38,7 @@ public:
       auto itr = o.end();
       itr--;
       o.erase(itr);
-      history_table o(code_account, SCOPE_ORDER>>1);
+      history_table o(CODE_ACCOUNT, SCOPE_ORDER>>1);
     }
   }
 
@@ -46,49 +46,49 @@ public:
   // @abi action empty
   void empty()
   {
-    require_auth(code_account);
+    require_auth(CODE_ACCOUNT);
     /*
-    plan_table p(code_account, code_account);
+    plan_table p(CODE_ACCOUNT, CODE_ACCOUNT);
     while (p.begin() != p.end())
     {
       auto itr = p.end();
       itr--;
       p.erase(itr);
-      plan_table p(code_account, code_account);
+      plan_table p(CODE_ACCOUNT, CODE_ACCOUNT);
     }
-    order_table o(code_account, SCOPE_ORDER>>1);
+    order_table o(CODE_ACCOUNT, SCOPE_ORDER>>1);
     while (o.begin() != o.end())
     {
       auto itr = o.end();
       itr--;
       o.erase(itr);
-      order_table o(code_account, SCOPE_ORDER>>1);
+      order_table o(CODE_ACCOUNT, SCOPE_ORDER>>1);
     }
 
-    plan_table p(code_account, code_account);
+    plan_table p(CODE_ACCOUNT, CODE_ACCOUNT);
     while (p.begin() != p.end())
     {
       auto itr = p.end();
       itr--;
       p.erase(itr);
-      plan_table p(code_account, code_account);
+      plan_table p(CODE_ACCOUNT, CODE_ACCOUNT);
     }
 
-    creditor_table c(code_account, SCOPE_CREDITOR>>1);
+    creditor_table c(CODE_ACCOUNT, SCOPE_CREDITOR>>1);
     while (c.begin() != c.end())
     {
       auto itr = c.end();
       itr--;
       c.erase(itr);
-      creditor_table c(code_account, SCOPE_CREDITOR>>1);
+      creditor_table c(CODE_ACCOUNT, SCOPE_CREDITOR>>1);
     }
-    freelock_table c(code_account, SCOPE_FREELOCK>>1);
+    freelock_table c(CODE_ACCOUNT, SCOPE_FREELOCK>>1);
     while (c.begin() != c.end())
     {
       auto itr = c.end();
       itr--;
       c.erase(itr);
-      freelock_table c(code_account, SCOPE_FREELOCK>>1);
+      freelock_table c(CODE_ACCOUNT, SCOPE_FREELOCK>>1);
     }
     */
   }
@@ -96,11 +96,11 @@ public:
   // @abi action test
   void test(account_name creditor)
   {
-    require_auth(code_account);
+    require_auth(CODE_ACCOUNT);
 
     validate_creditor(creditor);
 
-    plan_table p(code_account, code_account);
+    plan_table p(CODE_ACCOUNT, CODE_ACCOUNT);
     auto idx = p.get_index<N(price)>();
     auto plan = idx.find(FREE_PLAN_AMOUNT);
 
@@ -121,11 +121,11 @@ public:
   // @abi action check
   void check(account_name creditor)
   {
-    require_auth(code_account);
+    require_auth(CODE_ACCOUNT);
 
     validate_creditor(creditor);
 
-    order_table o(code_account, SCOPE_ORDER>>1);
+    order_table o(CODE_ACCOUNT, SCOPE_ORDER>>1);
     uint64_t depth = 0;
     std::vector<uint64_t> order_ids;
 
@@ -150,7 +150,7 @@ public:
   // @abi action forcexpire
   void forcexpire(const std::vector<uint64_t>& order_ids=std::vector<uint64_t>())
   {
-    require_auth(code_account);
+    require_auth(CODE_ACCOUNT);
 
     //force expire provided orders
     undelegate(order_ids, 0);
@@ -161,10 +161,10 @@ public:
   // @abi action expireorder
   void expireorder(uint64_t id)
   {
-    require_auth(code_account);
+    require_auth(CODE_ACCOUNT);
 
     std::string content = "";
-    order_table o(code_account, SCOPE_ORDER>>1);
+    order_table o(CODE_ACCOUNT, SCOPE_ORDER>>1);
     auto order = o.find(id);
     eosio_assert(order != o.end(), "order entry not found!!!");
 
@@ -182,10 +182,10 @@ public:
     content += "|" + std::to_string(order->expire_at);
 
     // updated cpu_staked/net_staked/cpu_unstaked/net_unstaked of creditor entry
-    creditor_table c(code_account, SCOPE_CREDITOR>>1);
+    creditor_table c(CODE_ACCOUNT, SCOPE_CREDITOR>>1);
     auto creditor_itr = c.find(order->creditor);
     asset balance = get_balance(order->creditor);
-    c.modify(creditor_itr, ram_payer, [&](auto &i) {
+    c.modify(creditor_itr, RAM_PAYER, [&](auto &i) {
       i.cpu_staked -= order->cpu_staked;
       i.net_staked -= order->net_staked;
       i.cpu_unstaked += order->cpu_staked;
@@ -198,8 +198,8 @@ public:
     o.erase(order);
 
     // save order mete data to history table
-    history_table h(code_account, SCOPE_HISTORY>>1);
-    h.emplace(ram_payer, [&](auto &i) {
+    history_table h(CODE_ACCOUNT, SCOPE_HISTORY>>1);
+    h.emplace(RAM_PAYER, [&](auto &i) {
       i.id = h.available_primary_key();
       i.content = content;
       i.created_at = now();
@@ -209,18 +209,18 @@ public:
   // @abi action addwhitelist
   void addwhitelist(account_name account, uint64_t capacity)
   {
-    require_auth(code_account);
-    whitelist_table w(code_account, SCOPE_WHITELIST>>1);
+    require_auth(CODE_ACCOUNT);
+    whitelist_table w(CODE_ACCOUNT, SCOPE_WHITELIST>>1);
     auto itr = w.find(account);
     if(itr == w.end()) {
-      w.emplace(ram_payer, [&](auto &i) {
+      w.emplace(RAM_PAYER, [&](auto &i) {
         i.account = account;
         i.capacity = capacity;
         i.created_at = now();
         i.updated_at = now();
       });
     } else {
-      w.modify(itr, ram_payer, [&](auto &i) {
+      w.modify(itr, RAM_PAYER, [&](auto &i) {
         i.capacity = capacity;
         i.updated_at = now();
       });
@@ -230,8 +230,8 @@ public:
   // @abi action delwhitelist
   void delwhitelist(account_name account, uint64_t capacity)
   {
-    require_auth(code_account);
-    whitelist_table w(code_account, SCOPE_WHITELIST>>1);
+    require_auth(CODE_ACCOUNT);
+    whitelist_table w(CODE_ACCOUNT, SCOPE_WHITELIST>>1);
     auto itr = w.find(account);
     eosio_assert(itr != w.end(), "account not found in whitelist table");
     //delelete whitelist entry
@@ -241,13 +241,13 @@ public:
   // @abi action addcreditor
   void addcreditor(account_name account, uint64_t for_free, std::string free_memo)
   {
-    require_auth(code_account);
-    creditor_table c(code_account, SCOPE_CREDITOR>>1);
+    require_auth(CODE_ACCOUNT);
+    creditor_table c(CODE_ACCOUNT, SCOPE_CREDITOR>>1);
     auto itr = c.find(account);
     eosio_assert(itr == c.end(), "account already exist in creditor table");
 
     asset balance = get_balance(account);
-    c.emplace(ram_payer, [&](auto &i) {
+    c.emplace(RAM_PAYER, [&](auto &i) {
       i.is_active = FALSE;
       i.for_free = for_free?TRUE:FALSE;
       i.free_memo = for_free?free_memo:"";
@@ -261,12 +261,12 @@ public:
   // @abi action addsafeacnt
   void addsafeacnt(account_name account)
   {
-    require_auth(code_account);
+    require_auth(CODE_ACCOUNT);
 
     validate_creditor(account);
 
-    safecreditor_table s(code_account, SCOPE_CREDITOR>>1);
-    s.emplace(ram_payer, [&](auto &i) {
+    safecreditor_table s(CODE_ACCOUNT, SCOPE_CREDITOR>>1);
+    s.emplace(RAM_PAYER, [&](auto &i) {
       i.account = account;
       i.created_at = now();
       i.updated_at = now();
@@ -276,8 +276,8 @@ public:
   // @abi action delsafeacnt
   void delsafeacnt(account_name account)
   {
-    require_auth(code_account);
-    safecreditor_table s(code_account, SCOPE_CREDITOR>>1);
+    require_auth(CODE_ACCOUNT);
+    safecreditor_table s(CODE_ACCOUNT, SCOPE_CREDITOR>>1);
     auto itr = s.find(account);
     eosio_assert(itr != s.end(), "account does not exist in safecreditor table");
     s.erase(itr);
@@ -287,8 +287,8 @@ public:
   // @abi action delcreditor
   void delcreditor(account_name account)
   {
-    require_auth(code_account);
-    creditor_table c(code_account, SCOPE_CREDITOR>>1);
+    require_auth(CODE_ACCOUNT);
+    creditor_table c(CODE_ACCOUNT, SCOPE_CREDITOR>>1);
     auto itr = c.find(account);
     eosio_assert(itr!= c.end(), "account not found in creditor table");
     eosio_assert(itr->is_active == FALSE, "cannot delete active creditor");
@@ -300,13 +300,13 @@ public:
   // @abi action addblacklist
   void addblacklist(account_name account)
   {
-    require_auth(code_account);
-    blacklist_table b(code_account, SCOPE_BLACKLIST>>1);
+    require_auth(CODE_ACCOUNT);
+    blacklist_table b(CODE_ACCOUNT, SCOPE_BLACKLIST>>1);
     auto itr = b.find(account);
     eosio_assert(itr == b.end(), "account already exist in blacklist table");
 
     // add entry
-    b.emplace(ram_payer, [&](auto &i) {
+    b.emplace(RAM_PAYER, [&](auto &i) {
       i.account = account;
       i.created_at = now();
     });
@@ -316,8 +316,8 @@ public:
   // @abi action delblacklist
   void delblacklist(account_name account)
   {
-    require_auth(code_account);
-    blacklist_table b(code_account, SCOPE_BLACKLIST>>1);
+    require_auth(CODE_ACCOUNT);
+    blacklist_table b(CODE_ACCOUNT, SCOPE_BLACKLIST>>1);
 
     //make sure specified blacklist account exists
     auto itr = b.find(account);
@@ -330,7 +330,7 @@ public:
   // @abi action activate
   void activate(account_name account)
   {
-    require_auth(code_account);
+    require_auth(CODE_ACCOUNT);
     activate_creditor(account);
   }
 
@@ -342,14 +342,14 @@ public:
                uint64_t duration,
                bool is_free)
   {
-    require_auth(code_account);
+    require_auth(CODE_ACCOUNT);
     validate_asset(price, cpu, net);
-    plan_table p(code_account, code_account);
+    plan_table p(CODE_ACCOUNT, CODE_ACCOUNT);
     auto idx = p.get_index<N(price)>();
     auto itr = idx.find(price.amount);
     if (itr == idx.end())
     {
-      p.emplace(ram_payer, [&](auto &i) {
+      p.emplace(RAM_PAYER, [&](auto &i) {
         i.id = p.available_primary_key();
         i.price = price;
         i.cpu = cpu;
@@ -363,7 +363,7 @@ public:
     }
     else
     {
-      idx.modify(itr, ram_payer, [&](auto &i) {
+      idx.modify(itr, RAM_PAYER, [&](auto &i) {
         i.cpu = cpu;
         i.net = net;
         i.duration = duration;
@@ -376,14 +376,14 @@ public:
   // @abi action activateplan
   void activateplan(asset price, bool is_active)
   {
-    require_auth(code_account);
+    require_auth(CODE_ACCOUNT);
     eosio_assert(price.is_valid(), "invalid price");
-    plan_table p(code_account, code_account);
+    plan_table p(CODE_ACCOUNT, CODE_ACCOUNT);
     auto idx = p.get_index<N(price)>();
     auto itr = idx.find(price.amount);
     eosio_assert(itr != idx.end(), "price not found");
 
-    idx.modify(itr, ram_payer, [&](auto &i) {
+    idx.modify(itr, RAM_PAYER, [&](auto &i) {
      i.is_active = is_active?TRUE:FALSE;
      i.updated_at = now();
     });
@@ -438,8 +438,8 @@ private:
     }
     eosio::transaction out;
 
-    order_table o(code_account, SCOPE_ORDER>>1);
-    plan_table p(code_account, code_account);
+    order_table o(CODE_ACCOUNT, SCOPE_ORDER>>1);
+    plan_table p(CODE_ACCOUNT, CODE_ACCOUNT);
 
     uint64_t nonce = 0;
 
@@ -459,8 +459,8 @@ private:
       out.actions.emplace_back(act1);
       //delete order entry
       action act2 = action(
-        permission_level{ code_account, N(bankperm) },
-        code_account, N(expireorder),
+        permission_level{ CODE_ACCOUNT, N(bankperm) },
+        CODE_ACCOUNT, N(expireorder),
         std::make_tuple(order_id)
       );
       out.actions.emplace_back(act2);
@@ -478,22 +478,22 @@ private:
         asset income = get_income(order.creditor, order.price);
         eosio_assert(income <= order.price, "income should not be greater than price");
         action act3 = action(
-          permission_level{ code_account, N(bankperm) },
+          permission_level{ CODE_ACCOUNT, N(bankperm) },
           N(eosio.token), N(transfer),
-          std::make_tuple(code_account, safe_transfer_account, income, memo)
+          std::make_tuple(CODE_ACCOUNT, MASK_TRANSFER, income, memo)
         );
         out.actions.emplace_back(act3);
 
-        // transfer reserved fund to reserved_account
+        // transfer reserved fund to STAKED_INCOME
         asset reserved = order.price - income;
         eosio_assert(reserved <= order.price, "reserved should not be greater than price");
-        username = name{reserved_account};
+        username = name{STAKED_INCOME};
         recipient_name = username.to_string();
         memo = recipient_name + " bankofstaked reserved";
         action act4 = action(
-          permission_level{ code_account, N(bankperm) },
+          permission_level{ CODE_ACCOUNT, N(bankperm) },
           N(eosio.token), N(transfer),
-          std::make_tuple(code_account, safe_transfer_account, reserved, memo)
+          std::make_tuple(CODE_ACCOUNT, MASK_TRANSFER, reserved, memo)
         );
         out.actions.emplace_back(act4);
 
@@ -503,7 +503,7 @@ private:
     if(duration > 0) {
       out.delay_sec = duration * SECONDS_PER_MIN;
     }
-    out.send((uint128_t(code_account) << 64) | current_time() | nonce, code_account, true);
+    out.send((uint128_t(CODE_ACCOUNT) << 64) | current_time() | nonce, CODE_ACCOUNT, true);
   }
 
   //token received
@@ -522,7 +522,7 @@ private:
         return;
       }
       //validate plan, is_active should be TRUE
-      plan_table p(code_account, code_account);
+      plan_table p(CODE_ACCOUNT, CODE_ACCOUNT);
       auto idx = p.get_index<N(price)>();
       auto plan = idx.find(t.quantity.amount);
       eosio_assert(plan->is_active == TRUE, "plan is in-active");
@@ -553,13 +553,13 @@ private:
       eosio_assert( is_account( creditor ), "creditor account does not exist");
 
       //validate buyer
-      //1. buyer shouldnt be code_account
+      //1. buyer shouldnt be CODE_ACCOUNT
       //2. buyer shouldnt be in blacklist
       //3. each buyer could only have 5 affective orders at most
       validate_buyer(buyer, plan->is_free);
 
       //validate beneficiary
-      //1. beneficiary shouldnt be code_account
+      //1. beneficiary shouldnt be CODE_ACCOUNT
       //2. beneficiary shouldnt be in blacklist
       //3. each beneficiary could only have 5 affective orders at most
       validate_beneficiary(beneficiary, creditor, plan->is_free);
@@ -575,13 +575,13 @@ private:
 
       //INLINE ACTION to call check action of `bankofstaked`
       INLINE_ACTION_SENDER(bankofstaked, check)
-      (code_account, {{code_account, N(bankperm)}}, {creditor});
+      (CODE_ACCOUNT, {{CODE_ACCOUNT, N(bankperm)}}, {creditor});
 
       // add cpu_staked&net_staked to creditor entry
       asset balance = get_balance(creditor);
-      creditor_table c(code_account, SCOPE_CREDITOR>>1);
+      creditor_table c(CODE_ACCOUNT, SCOPE_CREDITOR>>1);
       auto creditor_itr = c.find(creditor);
-      c.modify(creditor_itr, ram_payer, [&](auto &i) {
+      c.modify(creditor_itr, RAM_PAYER, [&](auto &i) {
         i.cpu_staked += plan->cpu;
         i.net_staked += plan->net;
         i.balance = balance;
@@ -590,8 +590,8 @@ private:
 
       //create Order entry
       uint64_t order_id;
-      order_table o(code_account, SCOPE_ORDER>>1);
-      o.emplace(ram_payer, [&](auto &i) {
+      order_table o(CODE_ACCOUNT, SCOPE_ORDER>>1);
+      o.emplace(RAM_PAYER, [&](auto &i) {
         i.id = o.available_primary_key();
         i.buyer = buyer;
         i.price = plan->price;
@@ -613,13 +613,13 @@ private:
         add_freelock(beneficiary);
         // auto refund immediately
         //INLINE ACTION to auto refund
-        creditor_table c(code_account, SCOPE_CREDITOR>>1);
+        creditor_table c(CODE_ACCOUNT, SCOPE_CREDITOR>>1);
         std::string free_memo = c.get(creditor).free_memo;
         auto username = name{buyer};
         std::string buyer_name = username.to_string();
         std::string memo = buyer_name + " " + free_memo;
         INLINE_ACTION_SENDER(eosio::token, transfer)
-        (N(eosio.token), {{code_account, N(bankperm)}}, {code_account, safe_transfer_account, plan->price, memo});
+        (N(eosio.token), {{CODE_ACCOUNT, N(bankperm)}}, {CODE_ACCOUNT, MASK_TRANSFER, plan->price, memo});
       }
 
       //deferred transaction to auto undelegate after expired

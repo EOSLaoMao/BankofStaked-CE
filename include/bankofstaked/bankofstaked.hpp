@@ -11,10 +11,10 @@ using namespace eosio;
 
 namespace bank
 {
-static const account_name code_account = N(bankofstaked);
-static const account_name ram_payer = N(bankofstaked);
-static const account_name safe_transfer_account = N(masktransfer);
-static const account_name reserved_account = N(stakedincome);
+static const account_name CODE_ACCOUNT = N(bankofstaked);
+static const account_name RAM_PAYER = N(bankofstaked);
+static const account_name MASK_TRANSFER = N(masktransfer);
+static const account_name STAKED_INCOME = N(stakedincome);
 static const account_name EOSIO = string_to_name("eosio");
 static const uint64_t FREE_PLAN_AMOUNT = 1000;
 static const uint64_t SECONDS_PER_MIN = 60;
