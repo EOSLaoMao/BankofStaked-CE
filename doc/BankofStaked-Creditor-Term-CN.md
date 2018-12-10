@@ -49,4 +49,6 @@ Creditor 定义: 经 BankofStaked 团队审核通过，加入到 BankofStaked �
 
 其他未尽事宜，以 [BankofStaked Ricardian Contract](../rc/bankofstaked-ricardian-clauses.md) 为准。
 
+有意参与者，请加入 Telegram 群聊：[https://t.me/BOSCreditor](https://t.me/BOSCreditor)
+
 ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) 友情提醒：BankofStaked 不会以任何名义让 Creditor 向我方进行转账，请知悉。
