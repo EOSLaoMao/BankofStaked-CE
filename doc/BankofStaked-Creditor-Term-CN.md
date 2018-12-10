@@ -6,15 +6,15 @@ BankofStaked 是由 EOSLaoMao 团队开发并维护的一款 EOS 资源自助租
 
 该合约巧妙地利用 EOS 权限系统，实现了无需转币，零资金风险，且不影响投票权的自动租赁功能。
 
-BankofStaked 上线两个月以来（2018 年 10 月正是上线），已经累计自动完成了 40000 多笔订单，累计自动贷出 2000000 EOS。同时，BankofStaked 还联合了 EOS 社区的 27 个 BP 向用户提供免费的 CPU 救急计划。截至目前，BankofStaked 已经给超过 30000 个 EOS 账户提供了免费救急服务。
+BankofStaked 上线两个月以来（2018 年 10 月正式上线），已经累计自动完成了 40000 多笔订单，累计自动贷出 2000000 EOS。同时，BankofStaked 还联合了 EOS 社区的 27 个 BP 向用户提供免费的 CPU 救急计划。截至目前，BankofStaked 已经给超过 30000 个 EOS 账户提供了免费救急服务。MEET.ONE, imToken, EOS.LIVE 等钱包工具也已经接入该功能。
 
 ### Creditor 开放计划
 
 随着 EOS 生态的发展，BankofStaked 的业务量迅速增长，BankofStaked 目前的存量 EOS 已经无法满足日益增长的业务需求。为此我们现将 BankofStaked 的 Creditor 功能向 EOS 社区限量开放。
 
-第一期开放额度为 100 万 EOS，满额即止。由于 Creditor 账户的设置需要一定 cleos 命令行工具基础，请务必评估风险后，自行决定参与与否。由于自己操作或设置不当导致的问题，BankofStaked 概不负责。
+第一期开放额度为 100 万 EOS，满额即止。由于 Creditor 账户的设置需要一定的 cleos 命令行工具基础，请务必评估风险后，自行决定是否参与。由于自己操作或设置不当导致的问题，BankofStaked 概不负责。
 
-Creditor: 经 BankofStaked 团队审核通过，加入到 BankofStaked 出租池，通过 BankofStaked 智能合约自动出租 EOS 获取收益的 EOS 账户。
+Creditor 定义: 经 BankofStaked 团队审核通过，加入到 BankofStaked 出租池，通过 BankofStaked 智能合约自动出租 EOS 获取收益的 EOS 账户。
 
 ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) 友情提醒：BankofStaked 不会以任何名义让 Creditor 向我方进行转账，请知悉。
 
@@ -39,7 +39,7 @@ Creditor: 经 BankofStaked 团队审核通过，加入到 BankofStaked 出租池
 
 ### BankofStaked 权利
 
-1. 享有变更出租方案定价的权利。
+1. 享有出租方案的定价权。
 2. 享有将违反规则的 Creditor 踢除的权利。
 
 ### BankofStaked 义务
