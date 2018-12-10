@@ -2,8 +2,7 @@
 
 ## 关于 BankofStaked
 
-BankofStaked 是由 EOSLaoMao 团队开发并维护的一款 EOS 资源自助租赁智能合约（[https://eoslaomao.com/bankofstaked](https://eoslaomao.com/bankofstaked)）。
-
+BankofStaked 是由 EOSLaoMao 团队开发并维护的一款 EOS 资源自助租赁智能合约（[https://eoslaomao.com/bankofstaked](https://eoslaomao.com/bankofstaked)）。 
 该合约巧妙地利用 EOS 权限系统，实现了无需转币，零资金风险，且不影响投票权的自动租赁功能。
 
 BankofStaked 上线两个月以来（2018 年 10 月正式上线），已经累计自动完成了 40000 多笔订单，累计自动贷出 2000000 EOS。同时，BankofStaked 还联合了 EOS 社区的 27 个 BP 向用户提供免费的 CPU 救急计划。截至目前，BankofStaked 已经给超过 30000 个 EOS 账户提供了免费救急服务。MEET.ONE, imToken, EOS.LIVE 等钱包工具也已经接入该功能。
@@ -20,7 +19,7 @@ Creditor 定义: 经 BankofStaked 团队审核通过，加入到 BankofStaked �
 
 ### Creditor 要求
 
-1. 有一个独立的 EOS 账户用做 Creditor，且账户余额大于 50000 EOS。
+1. 有一个独立的 EOS 账户用做 Creditor，且账户余额大于 20000 EOS。
 2. 该 Creditor 账户需部署 BankofStaked 提供的安全抵押合约（详情参见：[SafeDelegatebw](https://github.com/EOSLaoMao/SafeDelegatebw)）。
 3. 该 Creditor 账户需授权安全抵押合约的抵押和解抵押权限给 BankofStaked（详情参见：[SafeDelegatebw](https://github.com/EOSLaoMao/SafeDelegatebw)）。
 4. 该 Creditor 账户需确保账户自身具有足够的 RAM/CPU/NET 资源（详情参见：[Creditor 资源指引](./BankofStaked-Creditor-Resource-Guide.md)）。
