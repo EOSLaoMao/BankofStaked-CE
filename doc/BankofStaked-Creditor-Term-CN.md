@@ -16,7 +16,7 @@ BankofStaked 上线两个月以来（2018 年 10 月正是上线），已经累�
 
 Creditor: 经 BankofStaked 团队审核通过，加入到 BankofStaked 出租池，通过 BankofStaked 智能合约自动出租 EOS 获取收益的 EOS 账户。
 
-- ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) 友情提醒：BankofStaked 不会以任何名义让 Creditor 向我方进行转账，请知悉。
+![#f03c15](https://placehold.it/15/f03c15/000000?text=+) 友情提醒：BankofStaked 不会以任何名义让 Creditor 向我方进行转账，请知悉。
 
 ### Creditor 要求
 
@@ -49,4 +49,4 @@ Creditor: 经 BankofStaked 团队审核通过，加入到 BankofStaked 出租池
 
 其他未尽事宜，以 [BankofStaked Ricardian Contract](../rc/bankofstaked-ricardian-clauses.md) 为准。
 
-- ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) 友情提醒：BankofStaked 不会以任何名义让 Creditor 向我方进行转账，请知悉。
+![#f03c15](https://placehold.it/15/f03c15/000000?text=+) 友情提醒：BankofStaked 不会以任何名义让 Creditor 向我方进行转账，请知悉。
