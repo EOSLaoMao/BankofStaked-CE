@@ -16,9 +16,9 @@ sleep 1
 
 cleos -u $API set contract voter1 safedelegatebw
 sleep 1
-./safedelegatebw/delegate_perm.sh voter1 EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV
+./safedelegatebw/delegate_perm.sh voter1
 sleep 1
-./scripts/creditor_perm.sh voter1 EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV true
+./safedelegatebw/creditor_perm.sh voter1
 sleep 1
 ./scripts/creditor_perm.sh voter2 EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV
 sleep 1
