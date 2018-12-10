@@ -2,7 +2,7 @@
 
 ## 关于 BankofStaked
 
-BankofStaked 是由 EOSLaoMao 团队开发并维护的一款 EOS 资源自助租赁智能合约（https://eoslaomao.com/bankofstaked）。
+BankofStaked 是由 EOSLaoMao 团队开发并维护的一款 EOS 资源自助租赁智能合约（[https://eoslaomao.com/bankofstaked](https://eoslaomao.com/bankofstaked)）。
 
 该合约巧妙地利用 EOS 权限系统，实现了无需转币，零资金风险，且不影响投票权的自动租赁功能。
 
