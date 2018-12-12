@@ -12,3 +12,4 @@ cleos set action permission $ACCOUNT eosio delegatebw bankperm -p $ACCOUNT@activ
 cleos set action permission $ACCOUNT eosio undelegatebw bankperm -p $ACCOUNT@active
 cleos set action permission $ACCOUNT bankofstaked expireorder bankperm -p $ACCOUNT@active
 cleos set action permission $ACCOUNT bankofstaked check bankperm -p $ACCOUNT@active
+cleos set action permission $ACCOUNT bankofstaked rotate bankperm -p $ACCOUNT@active
