@@ -553,6 +553,7 @@ private:
       {
           asset to_delegate = plan->cpu + plan->net;
           asset balance = get_balance(creditor);
+          get_creditors(to_delegate);
           if(balance < to_delegate) {
             creditor = get_qualified_paid_creditor(to_delegate);
           }

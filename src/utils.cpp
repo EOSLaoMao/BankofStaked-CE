@@ -79,7 +79,17 @@ namespace utils
       }
       itr++;
     }
+    print("before:");
+    for(int i=0; i < creditor_pairs.size(); i++){
+      print(" | first:", creditor_pairs[i].first);
+      print("second:", creditor_pairs[i].second);
+    }
     sort(creditor_pairs.begin(), creditor_pairs.end(), sortbysec);
+    print("AFTER:");
+    for(int i=0; i < creditor_pairs.size(); i++){
+      print(" | first:", creditor_pairs[i].first);
+      print("second:", creditor_pairs[i].second);
+    }
     return creditor_pairs;
   }
 
