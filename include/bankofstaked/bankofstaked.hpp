@@ -186,6 +186,15 @@ struct whitelist
 };
 typedef multi_index<N(whitelist), whitelist> whitelist_table;
 
+struct order_pair
+{
+  account_name creditor; // account who received CPU&NET
+  asset cpu;
+  asset net;
+};
+
+
+
 }// namespace bank
 
 

@@ -59,6 +59,35 @@ namespace utils
     return balance;
   }
 
+  bool sortbysec(const std::pair<account_name, asset> &a,
+              const std::pair<account_name, asset> &b){
+    return (a.second < b.second);
+  }
+
+  std::vector<std::pair<account_name, asset>> get_creditors(asset to_delegate) {
+
+    std::vector<std::pair<account_name, asset>> creditor_pairs;
+    creditor_table c(CODE_ACCOUNT, SCOPE);
+    auto itr = c.begin();
+    account_name creditor;
+
+    while (itr != c.end())
+    {
+      asset balance = get_balance(itr->account);
+      if(itr->for_free == FALSE) {
+        creditor_pairs.emplace_back(std::pair<account_name, asset>({itr->account, itr->balance}));
+      }
+      itr++;
+    }
+    sort(creditor_pairs.begin(), creditor_pairs.end(), sortbysec);
+    return creditor_pairs;
+  }
+
+  std::vector<bank::order_pair> get_order_pairs(asset to_delegate) {
+    std::vector<bank::order_pair> pairs;
+    return pairs;
+  }
+
   //get creditor with balance >= to_delegate
   account_name get_qualified_paid_creditor(asset to_delegate)
   {
