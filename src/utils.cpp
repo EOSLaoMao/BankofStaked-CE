@@ -90,6 +90,29 @@ namespace utils
       print(" | first:", creditor_pairs[i].first);
       print("second:", creditor_pairs[i].second);
     }
+    asset total;
+    uint64_t count;
+    std::vector<std::pair<account_name, asset>> qualified_pairs;
+    for(int i=0; i < creditor_pairs.size(); i++){
+      qualified_pairs.clear();
+      qualified_pairs.emplace_back(creditor_pairs[i]);
+      total = creditor_pairs[i].second;
+      count = 1;
+      for(int j=i+1; j < creditor_pairs.size(); j++) {
+          count += 1;
+          if(count > 5) {break;}
+          total = creditor_pairs[j].second;
+          qualified_pairs.emplace_back(creditor_pairs[j]);
+      }
+      if (total >= to_delegate) {
+          break;
+      }
+    }
+    print("QUALIFIED:");
+    for(int i=0; i < qualified_pairs.size(); i++){
+      print(" | first:", qualified_pairs[i].first);
+      print("second:", qualified_pairs[i].second);
+    }
     return creditor_pairs;
   }
 
