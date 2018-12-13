@@ -98,10 +98,10 @@ This may include--without limitation:
 | Package | Amount | RAM | Bandwidth | Duration | Note |
 |---|---|---|---|---|---|
 | Free Plan | 0 | 0.8 | 0.2 | 8 hours | Available once per 24 hours |
-| Micro | 0.2 | 38 | 2 | 7 days | |
-| Mini | 0.5 | 95 | 5 | 7 days | |
-| Short | 1.0 | 185 | 5 | 7 days | |
-| Tall | 2.0 | 375 | 5 | 7 days | |
+| Micro | 0.2 | 28 | 2 | 7 days | |
+| Mini | 0.5 | 65 | 5 | 7 days | |
+| Short | 1.0 | 135 | 5 | 7 days | |
+| Tall | 2.0 | 275 | 5 | 7 days | |
 | Mercury | 130 | 9900 | 100 | 28 days | |
 | Gemini | 580 | 49500 | 500 | 28 days | |
 
