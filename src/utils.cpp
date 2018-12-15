@@ -4,6 +4,24 @@ using namespace bank;
 
 namespace utils
 {
+  //calculate order price
+  asset calculate_order_price(asset to_delegate, asset order_to_delegate, asset price) {
+      uint64_t order_price_amount = order_to_delegate.amount / to_delegate.amount * price.amount;
+      print("calculate_order_price:", order_price_amount);
+      print("\n");
+      price.amount = order_price_amount;
+      return price;
+  }
+
+  asset sum(std::vector<asset> &order_prices) {
+      asset total;
+      for(int i=0; i < order_prices.size(); i++){
+          total += order_prices[i];
+      }
+      return total;
+  }
+      
+
   //try to get beneficiary from memo, otherwise, use sender.
   account_name get_beneficiary(const std::string &memo, account_name sender)
   {
@@ -75,20 +93,24 @@ namespace utils
     {
       asset balance = get_balance(itr->account);
       if(itr->for_free == FALSE) {
-        creditor_pairs.emplace_back(std::pair<account_name, asset>({itr->account, itr->balance}));
+        creditor_pairs.emplace_back(std::pair<account_name, asset>({itr->account, get_balance(itr->account)}));
       }
       itr++;
     }
-    print("before:");
+    print("\nbefore:");
     for(int i=0; i < creditor_pairs.size(); i++){
-      print(" | first:", creditor_pairs[i].first);
-      print("second:", creditor_pairs[i].second);
+      auto username = name{creditor_pairs[i].first}.to_string();
+      print(" | account:", username);
+      print(" | balance:", creditor_pairs[i].second);
+      print("\n");
     }
     sort(creditor_pairs.begin(), creditor_pairs.end(), sortbysec);
-    print("AFTER:");
+    print("\nAFTER:");
     for(int i=0; i < creditor_pairs.size(); i++){
-      print(" | first:", creditor_pairs[i].first);
-      print("second:", creditor_pairs[i].second);
+      auto username = name{creditor_pairs[i].first}.to_string();
+      print(" | account:", username);
+      print(" | balance:", creditor_pairs[i].second);
+      print("\n");
     }
     asset total;
     uint64_t count;
@@ -100,20 +122,24 @@ namespace utils
       count = 1;
       for(int j=i+1; j < creditor_pairs.size(); j++) {
           count += 1;
-          if(count > 5) {break;}
-          total = creditor_pairs[j].second;
+          if(count > MAX_ORDER_SPLITS) {break;}
+          total += creditor_pairs[j].second;
           qualified_pairs.emplace_back(creditor_pairs[j]);
       }
       if (total >= to_delegate) {
           break;
       }
     }
-    print("QUALIFIED:");
+    //TODO assert qualified pairs has enough token
+    sort(qualified_pairs.begin(), qualified_pairs.end(), sortbysec);
+    print("\nQUALIFIED:");
     for(int i=0; i < qualified_pairs.size(); i++){
-      print(" | first:", qualified_pairs[i].first);
-      print("second:", qualified_pairs[i].second);
+      auto username = name{qualified_pairs[i].first}.to_string();
+      print(" | account:", username);
+      print(" | balance:", qualified_pairs[i].second);
+      print("\n");
     }
-    return creditor_pairs;
+    return qualified_pairs;
   }
 
   std::vector<bank::order_pair> get_order_pairs(asset to_delegate) {

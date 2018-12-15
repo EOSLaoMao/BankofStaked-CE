@@ -127,11 +127,15 @@ public:
   }
 
   // @abi action check
-  void check(account_name creditor)
+  void check(std::vector<account_name> &creditors)
   {
     require_auth(CODE_ACCOUNT);
 
-    validate_creditor(creditor);
+    for(int i=0; i<creditors.size(); i++) {
+        account_name creditor = creditors[i];
+        validate_creditor(creditor);
+        get_balance(creditor);
+    }
 
     order_table o(CODE_ACCOUNT, SCOPE);
     uint64_t depth = 0;
@@ -152,7 +156,6 @@ public:
     undelegate(order_ids, 0);
     expire_freelock();
     rotate_creditor();
-    get_balance(creditor);
   }
 
   // @abi action forcexpire
@@ -441,6 +444,7 @@ private:
   //deferred(if duration > 0) transaction to auto undelegate after expired
   void undelegate(const std::vector<uint64_t>& order_ids=std::vector<uint64_t>(), uint64_t duration=0)
   {
+    print("undelegate called!\n");
     if(order_ids.size() == 0) 
     {
       return;
@@ -455,9 +459,19 @@ private:
     for(int i=0; i<order_ids.size(); i++)
     {
       uint64_t order_id = order_ids[i];
+      print("aaaorder_id:", order_id);
+      print("\n");
+    }
+
+    for(int i=0; i<order_ids.size(); i++)
+    {
+      uint64_t order_id = order_ids[i];
+      print("order_id:", order_id);
+      print("\n");
       nonce += order_id;
       // get order entry
       auto order = o.get(order_id);
+      print("order found!\n");
 
       // undelegatebw action
       action act1 = action(
@@ -474,6 +488,7 @@ private:
       );
       out.actions.emplace_back(act2);
 
+      print("order found 491!\n");
       //if order is_free is not free, transfer income to creditor
       if (order.is_free == FALSE)
       {
@@ -485,6 +500,7 @@ private:
 
         // transfer income to creditor
         asset income = get_income(order.creditor, order.price);
+        print("order found 503!\n");
         eosio_assert(income <= order.price, "income should not be greater than price");
         action act3 = action(
           permission_level{ CODE_ACCOUNT, N(bankperm) },
@@ -493,6 +509,7 @@ private:
         );
         out.actions.emplace_back(act3);
 
+        print("order found 512!\n");
         // transfer reserved fund to STAKED_INCOME
         asset reserved = order.price - income;
         eosio_assert(reserved <= order.price, "reserved should not be greater than price");
@@ -506,6 +523,7 @@ private:
         );
         out.actions.emplace_back(act4);
 
+        print("order found 526!\n");
       }
     }
 
@@ -544,6 +562,9 @@ private:
       {
         validate_freelock(beneficiary);
       }
+      asset to_delegate = plan->cpu + plan->net;
+      asset to_delegate_cpu = plan->cpu;
+      asset to_delegate_net = plan->net;
 
       //get active creditor
       account_name creditor = get_active_creditor(plan->is_free);
@@ -551,91 +572,132 @@ private:
       //if plan is not free, make sure creditor has enough balance to delegate
       if(plan->is_free == FALSE)
       {
-          asset to_delegate = plan->cpu + plan->net;
           asset balance = get_balance(creditor);
-          get_creditors(to_delegate);
           if(balance < to_delegate) {
             creditor = get_qualified_paid_creditor(to_delegate);
           }
       }
 
-      //make sure creditor is a valid account
-      eosio_assert( is_account( creditor ), "creditor account does not exist");
+      //construct creditor_pairs list
+      std::vector<std::pair<account_name, asset>> creditor_pairs;
+      if (is_account( creditor )) {
+          creditor_pairs.emplace_back(std::pair<account_name, asset>({creditor, get_balance(creditor)}));
+      } else if (plan->is_free == FALSE) {
+          creditor_pairs = get_creditors(to_delegate);
+      }
+      //make sure creditor_pairs is not empty
+      eosio_assert( creditor_pairs.size() > 0, "no creditor to serve");
 
       //validate buyer
       //1. buyer shouldnt be CODE_ACCOUNT
       //2. buyer shouldnt be in blacklist
-      //3. each buyer could only have 5 affective orders at most
+      //3. each buyer could only have MAX_PAID_ORDERS/MAX_FREE_ORDERS affective orders at most
       validate_buyer(buyer, plan->is_free);
 
       //validate beneficiary
       //1. beneficiary shouldnt be CODE_ACCOUNT
       //2. beneficiary shouldnt be in blacklist
       //3. each beneficiary could only have 5 affective orders at most
-      validate_beneficiary(beneficiary, creditor, plan->is_free);
+      validate_beneficiary(beneficiary, creditor_pairs, plan->is_free);
 
-      //INLINE ACTION to delegate CPU&NET for beneficiary account
-      if (is_safe_creditor(creditor)) {
-        INLINE_ACTION_SENDER(safedelegatebw, delegatebw)
-        (creditor, {{creditor, N(creditorperm)}}, {beneficiary, plan->net, plan->cpu});
-      } else {
-        INLINE_ACTION_SENDER(eosiosystem::system_contract, delegatebw)
-        (EOSIO, {{creditor, N(creditorperm)}}, {creditor, beneficiary, plan->net, plan->cpu, false});
+      //delegate
+      std::vector<uint64_t> order_ids;
+      std::vector<asset> order_prices;
+      std::vector<account_name> creditors;
+      for(int i=0; i < creditor_pairs.size(); i++){
+          account_name creditor = creditor_pairs[i].first;
+          asset balance = creditor_pairs[i].second;
+          creditors.emplace_back(creditor);
+
+          asset order_to_delegate_cpu = std::min(to_delegate_cpu, balance);
+          to_delegate_cpu -= order_to_delegate_cpu;
+          asset new_balance = balance - order_to_delegate_cpu;
+
+          asset order_to_delegate_net = std::min(to_delegate_net, new_balance);
+          to_delegate_net -= order_to_delegate_net;
+          new_balance -= order_to_delegate_net;
+
+          print(" | order_to_delegate_cpu:", order_to_delegate_cpu);
+          print(" | order_to_delegate_net:", order_to_delegate_net);
+
+          print(" | 606 called\n");
+          eosio_assert(new_balance <= balance, "creditor overdrawn balance");
+
+          //INLINE ACTION to delegate CPU&NET for beneficiary account
+          if (is_safe_creditor(creditor)) {
+            INLINE_ACTION_SENDER(safedelegatebw, delegatebw)
+            (creditor, {{creditor, N(creditorperm)}}, {beneficiary, order_to_delegate_net, order_to_delegate_cpu});
+          } else {
+            INLINE_ACTION_SENDER(eosiosystem::system_contract, delegatebw)
+            (EOSIO, {{creditor, N(creditorperm)}}, {creditor, beneficiary, order_to_delegate_net, order_to_delegate_cpu, false});
+          }
+
+          // add cpu_staked&net_staked to creditor entry
+          creditor_table c(CODE_ACCOUNT, SCOPE);
+          auto creditor_itr = c.find(creditor);
+          c.modify(creditor_itr, RAM_PAYER, [&](auto &i) {
+            i.cpu_staked += order_to_delegate_cpu;
+            i.net_staked += order_to_delegate_net;
+            i.balance = get_balance(creditor);
+            i.updated_at = now();
+          });
+
+          //create Order entry
+          //calculate order price
+          asset order_to_delegate = order_to_delegate_net + order_to_delegate_cpu;
+          asset order_price;
+          if(i == creditor_pairs.size() - 1) {
+              order_price = plan->price - sum(order_prices);
+          } else {
+              order_price = calculate_order_price(to_delegate, order_to_delegate, plan->price);
+          }
+          print("order_price:", order_price);
+          print("\n");
+          eosio_assert(order_price <= plan->price, "invalid order price");
+          order_prices.emplace_back(order_price);
+          order_table o(CODE_ACCOUNT, SCOPE);
+          o.emplace(RAM_PAYER, [&](auto &i) {
+            i.id = o.available_primary_key();
+            i.buyer = buyer;
+            i.price = order_price;
+            i.creditor = creditor;
+            i.beneficiary = beneficiary;
+            i.plan_id = plan->id;
+            i.cpu_staked = order_to_delegate_cpu;
+            i.net_staked = order_to_delegate_net;
+            i.is_free = plan->is_free;
+            i.created_at = now();
+            i.expire_at = now() + plan->duration * SECONDS_PER_MIN;
+            order_ids.emplace_back(i.id);
+          });
+
+          if(plan->is_free == TRUE)
+          {
+            // if plan is free, add a Freelock entry
+            add_freelock(beneficiary);
+            // auto refund immediately
+            //INLINE ACTION to auto refund
+            creditor_table c(CODE_ACCOUNT, SCOPE);
+            std::string free_memo = c.get(creditor).free_memo;
+            auto username = name{buyer};
+            std::string buyer_name = username.to_string();
+            std::string memo = buyer_name + " " + free_memo;
+            INLINE_ACTION_SENDER(eosio::token, transfer)
+            (N(eosio.token), {{CODE_ACCOUNT, N(bankperm)}}, {CODE_ACCOUNT, MASK_TRANSFER, order_price, memo});
+          }
       }
+
+      //make sure order price accumulate is equal to plan price
+      eosio_assert(sum(order_prices) == plan->price, "order prices not equal plan price");
 
       //INLINE ACTION to call check action of `bankofstaked`
+      /*
       INLINE_ACTION_SENDER(bankofstaked, check)
-      (CODE_ACCOUNT, {{CODE_ACCOUNT, N(bankperm)}}, {creditor});
-
-      // add cpu_staked&net_staked to creditor entry
-      asset balance = get_balance(creditor);
-      creditor_table c(CODE_ACCOUNT, SCOPE);
-      auto creditor_itr = c.find(creditor);
-      c.modify(creditor_itr, RAM_PAYER, [&](auto &i) {
-        i.cpu_staked += plan->cpu;
-        i.net_staked += plan->net;
-        i.balance = balance;
-        i.updated_at = now();
-      });
-
-      //create Order entry
-      uint64_t order_id;
-      order_table o(CODE_ACCOUNT, SCOPE);
-      o.emplace(RAM_PAYER, [&](auto &i) {
-        i.id = o.available_primary_key();
-        i.buyer = buyer;
-        i.price = plan->price;
-        i.creditor = creditor;
-        i.beneficiary = beneficiary;
-        i.plan_id = plan->id;
-        i.cpu_staked = plan->cpu;
-        i.net_staked = plan->net;
-        i.is_free = plan->is_free;
-        i.created_at = now();
-        i.expire_at = now() + plan->duration * SECONDS_PER_MIN;
-
-        order_id = i.id;
-      });
-
-      if(plan->is_free == TRUE)
-      {
-        // if plan is free, add a Freelock entry
-        add_freelock(beneficiary);
-        // auto refund immediately
-        //INLINE ACTION to auto refund
-        creditor_table c(CODE_ACCOUNT, SCOPE);
-        std::string free_memo = c.get(creditor).free_memo;
-        auto username = name{buyer};
-        std::string buyer_name = username.to_string();
-        std::string memo = buyer_name + " " + free_memo;
-        INLINE_ACTION_SENDER(eosio::token, transfer)
-        (N(eosio.token), {{CODE_ACCOUNT, N(bankperm)}}, {CODE_ACCOUNT, MASK_TRANSFER, plan->price, memo});
-      }
-
+      (CODE_ACCOUNT, {{CODE_ACCOUNT, N(bankperm)}}, {creditors});
+      */
       //deferred transaction to auto undelegate after expired
-      std::vector<uint64_t> order_ids;
-      order_ids.emplace_back(order_id);
       undelegate(order_ids, plan->duration);
+      print("710 success!\n");
     }
   }
 };

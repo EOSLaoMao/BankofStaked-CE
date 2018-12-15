@@ -68,10 +68,12 @@ namespace validation
   }
 
   //make sure BENEFICIARY's affective free orders is no more than MAX_FREE_ORDERS
-  void validate_beneficiary(account_name beneficiary, account_name creditor, uint64_t is_free)
+  void validate_beneficiary(account_name beneficiary, std::vector<std::pair<account_name, asset>>& creditor_pairs, uint64_t is_free)
   {
     eosio_assert(beneficiary != CODE_ACCOUNT, "cannot delegate to bankofstaked");
-    eosio_assert(beneficiary != creditor, "cannot delegate to creditor");
+    for(int i=0; i < creditor_pairs.size(); i++){
+        eosio_assert(beneficiary != creditor_pairs[i].first, "cannot delegate to creditor");
+    }
 
     //validate blacklist
     validate_blacklist(beneficiary);

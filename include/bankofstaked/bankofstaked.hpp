@@ -16,6 +16,7 @@ static const account_name RAM_PAYER = N(bankofstaked);
 static const account_name MASK_TRANSFER = N(masktransfer);
 static const account_name STAKED_INCOME = N(stakedincome);
 static const account_name EOSIO = string_to_name("eosio");
+static const uint64_t MAX_ORDER_SPLITS = 2;
 static const uint64_t FREE_PLAN_AMOUNT = 1000;
 static const uint64_t SECONDS_PER_MIN = 60;
 static const uint64_t SECONDS_PER_DAY = 24 * 3600;
