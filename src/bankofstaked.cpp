@@ -133,6 +133,8 @@ public:
 
     for(int i=0; i<creditors.size(); i++) {
         account_name creditor = creditors[i];
+        print(creditor);
+        print("\n");
         validate_creditor(creditor);
         get_balance(creditor);
     }
@@ -648,8 +650,12 @@ private:
           asset order_price;
           if(i == creditor_pairs.size() - 1) {
               order_price = plan->price - sum(order_prices);
+              print("last order:", order_price);
+              print("\n");
           } else {
               order_price = calculate_order_price(to_delegate, order_to_delegate, plan->price);
+              print("non-last order:", order_price);
+              print("\n");
           }
           print("order_price:", order_price);
           print("\n");
