@@ -47,7 +47,14 @@ namespace utils
     auto symbol = symbol_type(system_token_symbol);
     eosio::token t(N(eosio.token));
     auto balance = t.get_balance(owner, symbol.name());
-    // update creditor if balance is outdated
+    return balance;
+  }
+
+  //get account EOS balance
+  asset update_balance(account_name owner)
+  {
+    auto balance = get_balance(owner);
+    // update creditor if update is true
     creditor_table c(CODE_ACCOUNT, SCOPE);
     auto creditor_itr = c.find(owner);
     if(creditor_itr != c.end() && creditor_itr->balance != balance) {
@@ -59,6 +66,8 @@ namespace utils
     return balance;
   }
 
+
+
   //get creditor with balance >= to_delegate
   account_name get_qualified_paid_creditor(asset to_delegate)
   {
@@ -69,7 +78,7 @@ namespace utils
     account_name creditor;
     while (itr != idx.end())
     {
-      asset balance = get_balance(itr->account);
+      asset balance = update_balance(itr->account);
       if(itr->for_free == FALSE && balance >= to_delegate) {
         creditor = itr->account;
         break;

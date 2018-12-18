@@ -152,7 +152,7 @@ public:
     undelegate(order_ids, 0);
     expire_freelock();
     rotate_creditor();
-    get_balance(creditor);
+    update_balance(creditor);
   }
 
   // @abi action forcexpire
@@ -192,13 +192,12 @@ public:
     // updated cpu_staked/net_staked/cpu_unstaked/net_unstaked of creditor entry
     creditor_table c(CODE_ACCOUNT, SCOPE);
     auto creditor_itr = c.find(order->creditor);
-    asset balance = get_balance(order->creditor);
     c.modify(creditor_itr, RAM_PAYER, [&](auto &i) {
       i.cpu_staked -= order->cpu_staked;
       i.net_staked -= order->net_staked;
       i.cpu_unstaked += order->cpu_staked;
       i.net_unstaked += order->net_staked;
-      i.balance = balance;
+      i.balance = get_balance(order->creditor);
       i.updated_at = now();
     });
 
@@ -254,13 +253,12 @@ public:
     auto itr = c.find(account);
     eosio_assert(itr == c.end(), "account already exist in creditor table");
 
-    asset balance = get_balance(account);
     c.emplace(RAM_PAYER, [&](auto &i) {
       i.is_active = FALSE;
       i.for_free = for_free?TRUE:FALSE;
       i.free_memo = for_free?free_memo:"";
       i.account = account;
-      i.balance = balance;
+      i.balance = get_balance(account);
       i.created_at = now();
       i.updated_at = 0; // set to 0 for creditor auto rotation
     });
@@ -552,8 +550,7 @@ private:
       if(plan->is_free == FALSE)
       {
           asset to_delegate = plan->cpu + plan->net;
-          asset balance = get_balance(creditor);
-          if(balance < to_delegate) {
+          if(get_balance(creditor) < to_delegate) {
             creditor = get_qualified_paid_creditor(to_delegate);
           }
       }
@@ -587,13 +584,12 @@ private:
       (CODE_ACCOUNT, {{CODE_ACCOUNT, N(bankperm)}}, {creditor});
 
       // add cpu_staked&net_staked to creditor entry
-      asset balance = get_balance(creditor);
       creditor_table c(CODE_ACCOUNT, SCOPE);
       auto creditor_itr = c.find(creditor);
       c.modify(creditor_itr, RAM_PAYER, [&](auto &i) {
         i.cpu_staked += plan->cpu;
         i.net_staked += plan->net;
-        i.balance = balance;
+        i.balance = get_balance(creditor);
         i.updated_at = now();
       });
 
