@@ -78,7 +78,7 @@ namespace utils
     account_name creditor;
     while (itr != idx.end())
     {
-      asset balance = update_balance(itr->account);
+      asset balance = get_balance(itr->account);
       if(itr->for_free == FALSE && balance >= to_delegate) {
         creditor = itr->account;
         break;
