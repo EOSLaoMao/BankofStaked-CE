@@ -188,4 +188,18 @@ typedef multi_index<N(whitelist), whitelist> whitelist_table;
 
 }// namespace bank
 
+// @abi table recipient i64
+struct recipient
+{
+  account_name creditor;
+  account_name recipient_account;
+  uint64_t created_at; // unix time, in seconds
+  uint64_t updated_at; // unix time, in seconds
+
+  account_name primary_key() const { return creditor; }
+
+  EOSLIB_SERIALIZE(recipient, (creditor)(recipient_account)(created_at)(updated_at));
+};
+typedef multi_index<N(recipient), recipient> recipient_table;
+
 

@@ -289,6 +289,40 @@ public:
     s.erase(itr);
   }
 
+  // @abi action setrecipient
+  void setrecipient(account_name creditor, account_name recipient)
+  {
+    require_auth(CODE_ACCOUNT);
+
+    validate_creditor(creditor);
+
+    recipient_table r(CODE_ACCOUNT, CODE_ACCOUNT);
+    auto itr = r.find(creditor);
+    if(itr == r.end()) {
+        r.emplace(RAM_PAYER, [&](auto &i) {
+          i.creditor = creditor;
+          i.recipient_account = recipient;
+          i.created_at = now();
+          i.updated_at = now();
+        });
+    } else {
+      r.modify(itr, RAM_PAYER, [&](auto &i) {
+        i.recipient_account = recipient;
+        i.updated_at = now();
+      });
+    }
+  }
+
+
+  // @abi action delrecipient
+  void delrecipient(account_name creditor)
+  {
+    require_auth(CODE_ACCOUNT);
+    recipient_table r(CODE_ACCOUNT, CODE_ACCOUNT);
+    auto itr = r.find(creditor);
+    eosio_assert(itr != r.end(), "recipient entry not found!!!");
+    r.erase(itr);
+  }
 
   // @abi action delcreditor
   void delcreditor(account_name account)
@@ -477,7 +511,7 @@ private:
       {
         auto plan = p.get(order.plan_id);
 
-        auto username = name{order.creditor};
+        auto username = name{get_recipient(order.creditor)};
         std::string recipient_name = username.to_string();
         std::string memo = recipient_name + " bankofstaked income";
 
