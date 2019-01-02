@@ -5,7 +5,7 @@ using namespace bank;
 namespace lock
 {
   //add freelock entry
-  void add_freelock(account_name beneficiary)
+  void add_freelock(name beneficiary)
   {
     freelock_table f(CODE_ACCOUNT, SCOPE);
     f.emplace(RAM_PAYER, [&](auto &i) {
@@ -21,7 +21,7 @@ namespace lock
     uint64_t depth = 0;
     uint64_t n = now();
     freelock_table f(CODE_ACCOUNT, SCOPE);
-    auto idx = f.get_index<N(expire_at)>();
+    auto idx = f.get_index<"expire.at"_n>();
     auto last = idx.upper_bound(n);
     auto itr = idx.lower_bound(0);
     while(itr!=last && depth < CHECK_MAX_DEPTH)

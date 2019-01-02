@@ -2,6 +2,7 @@
 RED='\033[01;31m'
 
 cd tests
+./clean-build.sh
 
 ./build.sh
 

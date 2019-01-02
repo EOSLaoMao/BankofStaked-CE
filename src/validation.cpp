@@ -6,27 +6,27 @@ using namespace utils;
 namespace validation
 {
   // check freelock
-  void validate_freelock(account_name beneficiary)
+  void validate_freelock(name beneficiary)
   {
     freelock_table f(CODE_ACCOUNT, SCOPE);
-    auto itr = f.find(beneficiary);
+    auto itr = f.find(beneficiary.value);
     eosio_assert(itr == f.end(), "free plan is avaliable every 24 hours for each beneficiary");
   }
 
   // check blacklist
-  void validate_blacklist(account_name account)
+  void validate_blacklist(name account)
   {
     blacklist_table b(CODE_ACCOUNT, SCOPE);
-    auto itr = b.find(account);
+    auto itr = b.find(account.value);
     eosio_assert(itr == b.end(), "something wrong with your account");
   }
 
   //get BUYER's free order amount limit
-  uint64_t get_free_order_cap(account_name buyer)
+  uint64_t get_free_order_cap(name buyer)
   {
     uint64_t max_orders = MAX_FREE_ORDERS;
     whitelist_table w(CODE_ACCOUNT, SCOPE);
-    auto itr = w.find(buyer);
+    auto itr = w.find(buyer.value);
     if(itr != w.end())
     {
        max_orders = itr->capacity;
@@ -35,7 +35,7 @@ namespace validation
   }
 
   //make sure BUYER's affective records is no more than get_free_order_cap(BUYER)
-  void validate_buyer(account_name buyer, uint64_t is_free)
+  void validate_buyer(name buyer, uint64_t is_free)
   {
     eosio_assert(buyer != CODE_ACCOUNT, "buyer cannot be bankofstaked");
 
@@ -52,9 +52,9 @@ namespace validation
     std::string error_msg = std::to_string(max_orders) + suffix;
 
     order_table o(CODE_ACCOUNT, SCOPE);
-    auto idx = o.get_index<N(buyer)>();
-    auto first = idx.lower_bound(buyer);
-    auto last = idx.upper_bound(buyer);
+    auto idx = o.get_index<"buyer"_n>();
+    auto first = idx.lower_bound(buyer.value);
+    auto last = idx.upper_bound(buyer.value);
     uint64_t count = 0;
     while(first != last && first != idx.end())
     {
@@ -68,7 +68,7 @@ namespace validation
   }
 
   //make sure BENEFICIARY's affective free orders is no more than MAX_FREE_ORDERS
-  void validate_beneficiary(account_name beneficiary, account_name creditor, uint64_t is_free)
+  void validate_beneficiary(name beneficiary, name creditor, uint64_t is_free)
   {
     eosio_assert(beneficiary != CODE_ACCOUNT, "cannot delegate to bankofstaked");
     eosio_assert(beneficiary != creditor, "cannot delegate to creditor");
@@ -92,9 +92,9 @@ namespace validation
     */
 
     order_table o(CODE_ACCOUNT, SCOPE);
-    auto idx = o.get_index<N(beneficiary)>();
-    auto first = idx.lower_bound(beneficiary);
-    auto last = idx.upper_bound(beneficiary);
+    auto idx = o.get_index<"beneficiary"_n>();
+    auto first = idx.lower_bound(beneficiary.value);
+    auto last = idx.upper_bound(beneficiary.value);
     uint64_t count = 0;
     while(first != last && first != idx.end())
     {
@@ -122,10 +122,10 @@ namespace validation
   }
 
   //validate account exist in creditor table
-  void validate_creditor(account_name creditor)
+  void validate_creditor(name creditor)
   {
     creditor_table c(CODE_ACCOUNT, SCOPE);
-    auto itr = c.find(creditor);
+    auto itr = c.find(creditor.value);
     eosio_assert(itr != c.end(), "account does not exist in creditor table");
   }
 }
