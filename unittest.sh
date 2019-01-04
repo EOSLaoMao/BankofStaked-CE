@@ -6,7 +6,7 @@ cd tests
 
 ./build.sh
 
-./build/tests/unit_test
+./build/tests/unit_test -- --verbose
 
 if [ $? -eq 0 ]; then
     echo "Run unit test success"
