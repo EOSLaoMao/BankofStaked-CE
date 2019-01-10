@@ -463,7 +463,9 @@ public:
           (test)
           (rotate)
           (clearhistory)
-          (forcexpire));
+          (forcexpire)
+          (setrecipient)
+          (delrecipient));
     };
   }
 
