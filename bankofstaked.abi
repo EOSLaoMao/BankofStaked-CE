@@ -1,0 +1,556 @@
+{
+  "version": "eosio::abi/1.0",
+  "types": [],
+  "structs": [{
+      "name": "freelock",
+      "base": "",
+      "fields": [{
+          "name": "beneficiary",
+          "type": "name"
+        },{
+          "name": "created_at",
+          "type": "uint64"
+        },{
+          "name": "expire_at",
+          "type": "uint64"
+        }
+      ]
+    },{
+      "name": "order",
+      "base": "",
+      "fields": [{
+          "name": "id",
+          "type": "uint64"
+        },{
+          "name": "buyer",
+          "type": "name"
+        },{
+          "name": "price",
+          "type": "asset"
+        },{
+          "name": "is_free",
+          "type": "uint64"
+        },{
+          "name": "creditor",
+          "type": "name"
+        },{
+          "name": "beneficiary",
+          "type": "name"
+        },{
+          "name": "plan_id",
+          "type": "uint64"
+        },{
+          "name": "cpu_staked",
+          "type": "asset"
+        },{
+          "name": "net_staked",
+          "type": "asset"
+        },{
+          "name": "created_at",
+          "type": "uint64"
+        },{
+          "name": "expire_at",
+          "type": "uint64"
+        }
+      ]
+    },{
+      "name": "history",
+      "base": "",
+      "fields": [{
+          "name": "id",
+          "type": "uint64"
+        },{
+          "name": "content",
+          "type": "string"
+        },{
+          "name": "created_at",
+          "type": "uint64"
+        }
+      ]
+    },{
+      "name": "plan",
+      "base": "",
+      "fields": [{
+          "name": "id",
+          "type": "uint64"
+        },{
+          "name": "price",
+          "type": "asset"
+        },{
+          "name": "cpu",
+          "type": "asset"
+        },{
+          "name": "net",
+          "type": "asset"
+        },{
+          "name": "duration",
+          "type": "uint64"
+        },{
+          "name": "is_free",
+          "type": "uint64"
+        },{
+          "name": "is_active",
+          "type": "uint64"
+        },{
+          "name": "created_at",
+          "type": "uint64"
+        },{
+          "name": "updated_at",
+          "type": "uint64"
+        }
+      ]
+    },{
+      "name": "safecreditor",
+      "base": "",
+      "fields": [{
+          "name": "account",
+          "type": "name"
+        },{
+          "name": "created_at",
+          "type": "uint64"
+        },{
+          "name": "updated_at",
+          "type": "uint64"
+        }
+      ]
+    },{
+      "name": "dividend",
+      "base": "",
+      "fields": [{
+          "name": "account",
+          "type": "name"
+        },{
+          "name": "percentage",
+          "type": "uint64"
+        }
+      ]
+    },{
+      "name": "creditor",
+      "base": "",
+      "fields": [{
+          "name": "account",
+          "type": "name"
+        },{
+          "name": "is_active",
+          "type": "uint64"
+        },{
+          "name": "for_free",
+          "type": "uint64"
+        },{
+          "name": "free_memo",
+          "type": "string"
+        },{
+          "name": "balance",
+          "type": "asset"
+        },{
+          "name": "cpu_staked",
+          "type": "asset"
+        },{
+          "name": "net_staked",
+          "type": "asset"
+        },{
+          "name": "cpu_unstaked",
+          "type": "asset"
+        },{
+          "name": "net_unstaked",
+          "type": "asset"
+        },{
+          "name": "created_at",
+          "type": "uint64"
+        },{
+          "name": "updated_at",
+          "type": "uint64"
+        }
+      ]
+    },{
+      "name": "blacklist",
+      "base": "",
+      "fields": [{
+          "name": "account",
+          "type": "name"
+        },{
+          "name": "created_at",
+          "type": "uint64"
+        }
+      ]
+    },{
+      "name": "whitelist",
+      "base": "",
+      "fields": [{
+          "name": "account",
+          "type": "name"
+        },{
+          "name": "capacity",
+          "type": "uint64"
+        },{
+          "name": "updated_at",
+          "type": "uint64"
+        },{
+          "name": "created_at",
+          "type": "uint64"
+        }
+      ]
+    },{
+      "name": "delegatebw",
+      "base": "",
+      "fields": [{
+          "name": "to",
+          "type": "name"
+        },{
+          "name": "net_weight",
+          "type": "asset"
+        },{
+          "name": "cpu_weight",
+          "type": "asset"
+        }
+      ]
+    },{
+      "name": "clearhistory",
+      "base": "",
+      "fields": [{
+          "name": "max_depth",
+          "type": "uint64"
+        }
+      ]
+    },{
+      "name": "empty",
+      "base": "",
+      "fields": []
+    },{
+      "name": "test",
+      "base": "",
+      "fields": [{
+          "name": "creditor",
+          "type": "name"
+        }
+      ]
+    },{
+      "name": "rotate",
+      "base": "",
+      "fields": [{
+          "name": "creditor",
+          "type": "name"
+        },{
+          "name": "for_free",
+          "type": "uint64"
+        }
+      ]
+    },{
+      "name": "check",
+      "base": "",
+      "fields": [{
+          "name": "creditor",
+          "type": "name"
+        }
+      ]
+    },{
+      "name": "forcexpire",
+      "base": "",
+      "fields": [{
+          "name": "order_ids",
+          "type": "uint64[]"
+        }
+      ]
+    },{
+      "name": "expireorder",
+      "base": "",
+      "fields": [{
+          "name": "id",
+          "type": "uint64"
+        }
+      ]
+    },{
+      "name": "addwhitelist",
+      "base": "",
+      "fields": [{
+          "name": "account",
+          "type": "name"
+        },{
+          "name": "capacity",
+          "type": "uint64"
+        }
+      ]
+    },{
+      "name": "delwhitelist",
+      "base": "",
+      "fields": [{
+          "name": "account",
+          "type": "name"
+        },{
+          "name": "capacity",
+          "type": "uint64"
+        }
+      ]
+    },{
+      "name": "addcreditor",
+      "base": "",
+      "fields": [{
+          "name": "account",
+          "type": "name"
+        },{
+          "name": "for_free",
+          "type": "uint64"
+        },{
+          "name": "free_memo",
+          "type": "string"
+        }
+      ]
+    },{
+      "name": "addsafeacnt",
+      "base": "",
+      "fields": [{
+          "name": "account",
+          "type": "name"
+        }
+      ]
+    },{
+      "name": "delsafeacnt",
+      "base": "",
+      "fields": [{
+          "name": "account",
+          "type": "name"
+        }
+      ]
+    },{
+      "name": "delcreditor",
+      "base": "",
+      "fields": [{
+          "name": "account",
+          "type": "name"
+        }
+      ]
+    },{
+      "name": "addblacklist",
+      "base": "",
+      "fields": [{
+          "name": "account",
+          "type": "name"
+        }
+      ]
+    },{
+      "name": "delblacklist",
+      "base": "",
+      "fields": [{
+          "name": "account",
+          "type": "name"
+        }
+      ]
+    },{
+      "name": "activate",
+      "base": "",
+      "fields": [{
+          "name": "account",
+          "type": "name"
+        }
+      ]
+    },{
+      "name": "setplan",
+      "base": "",
+      "fields": [{
+          "name": "price",
+          "type": "asset"
+        },{
+          "name": "cpu",
+          "type": "asset"
+        },{
+          "name": "net",
+          "type": "asset"
+        },{
+          "name": "duration",
+          "type": "uint64"
+        },{
+          "name": "is_free",
+          "type": "bool"
+        }
+      ]
+    },{
+      "name": "activateplan",
+      "base": "",
+      "fields": [{
+          "name": "price",
+          "type": "asset"
+        },{
+          "name": "is_active",
+          "type": "bool"
+        }
+      ]
+    }
+  ],
+  "actions": [{
+      "name": "delegatebw",
+      "type": "delegatebw",
+      "ricardian_contract": ""
+    },{
+      "name": "clearhistory",
+      "type": "clearhistory",
+      "ricardian_contract": ""
+    },{
+      "name": "empty",
+      "type": "empty",
+      "ricardian_contract": ""
+    },{
+      "name": "test",
+      "type": "test",
+      "ricardian_contract": ""
+    },{
+      "name": "rotate",
+      "type": "rotate",
+      "ricardian_contract": ""
+    },{
+      "name": "check",
+      "type": "check",
+      "ricardian_contract": ""
+    },{
+      "name": "forcexpire",
+      "type": "forcexpire",
+      "ricardian_contract": ""
+    },{
+      "name": "expireorder",
+      "type": "expireorder",
+      "ricardian_contract": ""
+    },{
+      "name": "addwhitelist",
+      "type": "addwhitelist",
+      "ricardian_contract": ""
+    },{
+      "name": "delwhitelist",
+      "type": "delwhitelist",
+      "ricardian_contract": ""
+    },{
+      "name": "addcreditor",
+      "type": "addcreditor",
+      "ricardian_contract": ""
+    },{
+      "name": "addsafeacnt",
+      "type": "addsafeacnt",
+      "ricardian_contract": ""
+    },{
+      "name": "delsafeacnt",
+      "type": "delsafeacnt",
+      "ricardian_contract": ""
+    },{
+      "name": "delcreditor",
+      "type": "delcreditor",
+      "ricardian_contract": ""
+    },{
+      "name": "addblacklist",
+      "type": "addblacklist",
+      "ricardian_contract": ""
+    },{
+      "name": "delblacklist",
+      "type": "delblacklist",
+      "ricardian_contract": ""
+    },{
+      "name": "activate",
+      "type": "activate",
+      "ricardian_contract": ""
+    },{
+      "name": "setplan",
+      "type": "setplan",
+      "ricardian_contract": ""
+    },{
+      "name": "activateplan",
+      "type": "activateplan",
+      "ricardian_contract": ""
+    }
+  ],
+  "tables": [{
+      "name": "freelock",
+      "index_type": "i64",
+      "key_names": [
+        "beneficiary"
+      ],
+      "key_types": [
+        "name"
+      ],
+      "type": "freelock"
+    },{
+      "name": "order",
+      "index_type": "i64",
+      "key_names": [
+        "id"
+      ],
+      "key_types": [
+        "uint64"
+      ],
+      "type": "order"
+    },{
+      "name": "history",
+      "index_type": "i64",
+      "key_names": [
+        "id"
+      ],
+      "key_types": [
+        "uint64"
+      ],
+      "type": "history"
+    },{
+      "name": "plan",
+      "index_type": "i64",
+      "key_names": [
+        "id"
+      ],
+      "key_types": [
+        "uint64"
+      ],
+      "type": "plan"
+    },{
+      "name": "safecreditor",
+      "index_type": "i64",
+      "key_names": [
+        "account"
+      ],
+      "key_types": [
+        "name"
+      ],
+      "type": "safecreditor"
+    },{
+      "name": "dividend",
+      "index_type": "i64",
+      "key_names": [
+        "account"
+      ],
+      "key_types": [
+        "name"
+      ],
+      "type": "dividend"
+    },{
+      "name": "creditor",
+      "index_type": "i64",
+      "key_names": [
+        "account"
+      ],
+      "key_types": [
+        "name"
+      ],
+      "type": "creditor"
+    },{
+      "name": "blacklist",
+      "index_type": "i64",
+      "key_names": [
+        "account"
+      ],
+      "key_types": [
+        "name"
+      ],
+      "type": "blacklist"
+    },{
+      "name": "whitelist",
+      "index_type": "i64",
+      "key_names": [
+        "account"
+      ],
+      "key_types": [
+        "name"
+      ],
+      "type": "whitelist"
+    }
+  ],
+  "ricardian_clauses": [{
+      "id":"Ricardian Clauses for **BankofStaked**",
+      "body": "## Preamble\n\nEOS is a wonderful tool for the world to use in commercial applications; there are however some complications that may arise from its resource allocation and planning.BankofStaked aims to help by providing an automated service for resource allocation within EOS in exchange for fixed costs over a predefined duration.\n\n## Executive Summary\n\n BankofStaked provides the workflow to arrange Creditor to temporarily delegate resources to Beneficiary in exchange for a Fee. ## Language and Interpretation\n\n The operative language is English.\n\n ## Definitions\n\n * Beneficiary: the person who is recipient of delegation.\n * Chain: the chain with the ID `aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906`.\n * Creditor: the person who makes resources available for delegation.\n * Delegation: the assignment of resources from Creditor to Beneficiary.\n * Fee: tokens transfered into BankofStaked that exactly correspond to a fee schedule amount.\n * Fee Schedule: the list of services provided with their corresponding amount, which can be fetched from pricing table of BankofStaked smart contract.\n\n ## Roles\n\n This smart contract defines the following roles:\n 1. Code: the account that manages this contract\n 1. Creditor: any account that grants Code delegate/undelegate permission on some of its token\n 1. Beneficiary: any account that pays fee in order to receive delegation\n\n ## Scope\n\n This contract applies to Chain, with the ID as defined above. Each chain may have its own operative version of this contract. Each chain's contract is severable and independent.\n\n ## Acceptance\n\n Any party making use or taking benefit from this contract is considered to agree to the terms set forth herein, as per their role as defined in Roles section.\n\n ## Role: Code\n\n### Obligations\n\nOn a best effort basis, Code aims to:\n1. maintain this contract's operational status.\n1. grant delegation to beneficiary resources as per Fee Schedule.\n1. return funds transfered to this contract which does not match Fee Schedule.\n1. release delegation upon expiry.\n1. to distribute 90% of the fee to Creditor whose token was invovled in a delegation.\n\n ### Rights\n\nCode reserves the right to:\n 1. update the terms of Fee Schedule without notice nor justification.\n 1. revoke delegation to any beneficiary for violation of terms set forth herein.\n 1. decline service to any beneficiary without notice nor justification.\n\n ## Role: Creditor\n\n ### Obligations\n\n 1. Creditor agrees to refrain from revoking delegate/undelegate permission without submitting Code 3 days' prior notice, as per Communications Protocols defined herein.\n 1. Failure to provide proper notice before revoking delegate/undelegate permission, resulting in interruption of service for Beneficiary, Creditor forfeits his right to proceeds from the fees.\n 1. All communications intended for Code are to be sent as per Communications Protocol prescribed below.\n\n ### Rights\n\n 1. Creditor has a right to 90% of proceeds from the fees accrued by a delegation at the time of release.\n\n ## Role: Beneficiary\n\n ### Obligations\n 1. To refrain from submitting an unreasonable amount of requests.\n 1. All communications intended for Code are to be sent as per Communications Protocol prescribed below.\n\n ### Rights\n 1. For duly submitted fees resulting in a delegation order, Beneficiary may have an expectation of maintenance of delegation.\n 1. Beneficiaries who suffer an interruption of delegation may claim either: (i) a refund, or (ii) credit toward a delegation of equal value.\n\n ## Communications Protocol\n\n All notices under this contract intended for Code, must be sent by email to the following address: `bos@eoslaomao.com`\n\n ## Force Majeure\n\n In any event outside of BankofStaked's ability to control or influence, BankofStaked is not liable for any failure to perform as a result of said event.\n\n This may include--without limitation:\n * an interruption of service of the EOS Chain;\n * hacking/compromise of BankofStaked or Code account;\n * natural disater or act of God."
+      }],
+  "error_messages": [],
+  "abi_extensions": [],
+  "variants": []
+}

@@ -1,5 +1,4 @@
 *.wasm
 *.wast
-*.abi
 build
 tests/build
