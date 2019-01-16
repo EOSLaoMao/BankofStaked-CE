@@ -21,7 +21,7 @@ The operative language is English.
  * Creditor: the person who makes resources available for delegation.
  * Delegation: the assignment of resources from Creditor to Beneficiary.
  * Fee: tokens transfered into BankofStaked that exactly correspond to a fee schedule amount.
- * Fee Schedule: the list of services provided with their corresponding amount.
+ * Fee Schedule: the list of services provided with their corresponding amount, which can be fetched from pricing table of BankofStaked smart contract.
 
 ## Roles
 
@@ -92,17 +92,3 @@ This may include--without limitation:
  * an interruption of service of the EOS Chain;
  * hacking/compromise of BankofStaked or Code account;
  * natural disater or act of God.
-
-## Fee Schedule
-
-| Package | Amount | RAM | Bandwidth | Duration | Note |
-|---|---|---|---|---|---|
-| Free Plan | 0 | 0.8 | 0.2 | 8 hours | Available once per 24 hours |
-| Micro | 0.2 | 22 | 2 | 7 days | |
-| Mini | 0.5 | 58 | 2 | 7 days | |
-| Short | 1.0 | 118 | 2 | 7 days | |
-| Tall | 2.0 | 238 | 2 | 7 days | |
-| Mercury | 180 | 9900 | 100 | 28 days | |
-| Gemini | 780 | 49500 | 500 | 28 days | |
-
-Note: all amounts set in Fee Schedule are denominated in EOS token.
