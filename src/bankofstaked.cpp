@@ -590,7 +590,7 @@ private:
         auto plan = p.get(order.plan_id);
 
         auto username = get_recipient(order.creditor);
-        std::string recipient_name = username;
+        std::string recipient_name = username.to_string();
         std::string memo = recipient_name + " bankofstaked income";
 
         // transfer income to creditor

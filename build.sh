@@ -16,10 +16,12 @@ docker exec $NAME-eos-dev eosio-cpp --contract bankofstaked \
     -R /$NAME/rc/bankofstaked.ricardian.clauses.md
 docker exec $NAME-eos-dev cp /$NAME.abi /$NAME.wasm /$NAME/
 
-if [ ! -d build ]; then
-    mkdir build
-    echo "Create build dir!!"
+if [ -d build ]; then
+    rm -rf build
 fi
+
+mkdir build
+echo "Create build dir!!"
 
 mv $NAME.abi ./build
 mv $NAME.wasm ./build

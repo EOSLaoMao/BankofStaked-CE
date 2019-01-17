@@ -26,6 +26,9 @@ class bankofstaked_tester : public eosio_system_tester
         produce_blocks();
 
         eosio_system_tester::create_account_with_resources( N(bankofstaked), config::system_account_name, core_sym::from_string("100.0000"), false );
+        eosio_system_tester::create_account_with_resources( N(masktransfer), config::system_account_name, core_sym::from_string("10.0000"), false );
+        eosio_system_tester::create_account_with_resources( N(stakedincome), config::system_account_name, core_sym::from_string("10.0000"), false );
+
         eosio_system_tester::create_account_with_resources(
             N(alice.111111),
             config::system_account_name,
@@ -50,11 +53,29 @@ class bankofstaked_tester : public eosio_system_tester
             core_sym::from_string("10.0000"),
             core_sym::from_string("10.0000")
         );
+        eosio_system_tester::create_account_with_resources(
+            N(ted.11111111),
+            config::system_account_name,
+            core_sym::from_string("10.0000"),
+            false,
+            core_sym::from_string("10.0000"),
+            core_sym::from_string("10.0000")
+        );
+        eosio_system_tester::create_account_with_resources(
+            N(carol.222222),
+            config::system_account_name,
+            core_sym::from_string("10.0000"),
+            false,
+            core_sym::from_string("10.0000"),
+            core_sym::from_string("10.0000")
+        );
 
         eosio_system_tester::issue(N(bankofstaked), core_sym::from_string("50.0000"));
         eosio_system_tester::issue(N(alice.111111), core_sym::from_string("500.0000"));
         eosio_system_tester::issue(N(bob.11111111), core_sym::from_string("5000.0000"));
+        eosio_system_tester::issue(N(ted.11111111), core_sym::from_string("6000.0000"));
         eosio_system_tester::issue(N(carol.111111), core_sym::from_string("50000.0000"));
+        eosio_system_tester::issue(N(carol.222222), core_sym::from_string("60000.0000"));
 
         produce_blocks();
 
@@ -85,6 +106,8 @@ class bankofstaked_tester : public eosio_system_tester
         set_code(N(bankofstaked), contracts::bank_wasm());
         set_abi(N(bankofstaked), contracts::bank_abi().data());
         produce_blocks();
+
+        eosio_system_tester::cross_15_percent_threshold();
 
         const auto &accnt = control->db().get<account_object, by_name>(N(bankofstaked));
         abi_def bank_abi;
@@ -137,14 +160,6 @@ class bankofstaked_tester : public eosio_system_tester
     {
         vector<char> data = get_row_by_secondary_key(N(bankofstaked), 921459758687, N(order), buyer.value);
         return data.empty() ? EMPTY : bank_abi_ser.binary_to_variant("order", data, abi_serializer_max_time);
-    }
-
-    fc::variant get_account(account_name acc, const string &symbolname)
-    {
-        auto symb = eosio::chain::symbol::from_string(symbolname);
-        auto symbol_code = symb.to_symbol_code().value;
-        vector<char> data = get_row_by_account(N(eosio.token), acc, N(accounts), symbol_code);
-        return data.empty() ? EMPTY : eosio_system_tester::token_abi_ser.binary_to_variant("account", data, abi_serializer_max_time);
     }
 
     vector<char> get_row_by_secondary_key( uint64_t code, uint64_t scope, uint64_t table, uint64_t key ) const {

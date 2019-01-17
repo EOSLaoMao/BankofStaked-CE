@@ -545,22 +545,175 @@ try
         order
     );
 
-    // produce_blocks(300);
-    // creditor = get_creditor("carol.111111");
-    // REQUIRE_MATCHING_OBJECT(mvo()
-    //     ("is_active", 1)
-    //     ("for_free", 0)
-    //     ("free_memo", "")
-    //     ("account", "carol.111111")
-    //     ("balance", "50000.0000 EOS")
-    //     ("cpu_staked", "0.0000 EOS")
-    //     ("net_staked", "0.0000 EOS")
-    //     ("cpu_unstaked", "10.0000 EOS")
-    //     ("net_unstaked", "10.0000 EOS"),
-    //     creditor
-    // );
+    // after 2 minutes
+    produce_blocks(240);
+
+    creditor = get_creditor("carol.111111");
+    REQUIRE_MATCHING_OBJECT(mvo()
+        ("is_active", 1)
+        ("for_free", 0)
+        ("free_memo", "")
+        ("account", "carol.111111")
+        ("balance", "49980.0000 EOS")
+        ("cpu_staked", "0.0000 EOS")
+        ("net_staked", "0.0000 EOS")
+        ("cpu_unstaked", "10.0000 EOS")
+        ("net_unstaked", "10.0000 EOS"),
+        creditor
+    );
+
+    BOOST_REQUIRE_EQUAL(get_balance(N(masktransfer)), asset::from_string("1.0000 EOS"));
+}
+FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE(buy_free_plan_test, bankofstaked_tester)
+try
+{
+    push_action(N(bankofstaked), N(setplan), mvo()
+        ("price", "0.1000 EOS")
+        ("cpu", "1.0000 EOS")
+        ("net", "1.0000 EOS")
+        ("duration", 1)
+        ("is_free", 1));
+    push_action(N(bankofstaked), N(setplan), mvo()
+        ("price", "1.0000 EOS")
+        ("cpu", "10.0000 EOS")
+        ("net", "10.0000 EOS")
+        ("duration", 2)
+        ("is_free", 0));
+
+    push_action(N(bankofstaked), N(addcreditor), mvo()("account", "bob.11111111")("for_free", 1)("free_memo", "hell yeah!"));
+    push_action(N(bankofstaked), N(addcreditor), mvo()("account", "carol.111111")("for_free", 0)("free_memo", "should be ignored"));
+
+    push_action(N(bankofstaked), N(activateplan), mvo()
+        ("price", "0.1000 EOS")
+        ("is_active", 1));
+    push_action(N(bankofstaked), N(activateplan), mvo()
+        ("price", "1.0000 EOS")
+        ("is_active", 1));
+
+    push_action(N(bankofstaked), N(activate), mvo()("account", "bob.11111111"));
+    push_action(N(bankofstaked), N(activate), mvo()("account", "carol.111111"));
+    produce_blocks();
+
+    eosio_system_tester::transfer(N(alice.111111), N(bankofstaked), core_sym::from_string("0.1000"), N(alice.111111));
+    produce_blocks();
+
+    auto creditor = get_creditor("bob.11111111");
+    REQUIRE_MATCHING_OBJECT(mvo()
+        ("is_active", 1)
+        ("for_free", 1)
+        ("free_memo", "hell yeah!")
+        ("account", "bob.11111111")
+        ("balance", "5000.0000 EOS")
+        ("cpu_staked", "1.0000 EOS")
+        ("net_staked", "1.0000 EOS")
+        ("cpu_unstaked", "0.0000 EOS")
+        ("net_unstaked", "0.0000 EOS"),
+        creditor
+    );
+
+    auto order = get_order("alice.111111");
+    REQUIRE_MATCHING_OBJECT(mvo()
+        ("buyer", "alice.111111")
+        ("price", "0.1000 EOS")
+        ("is_free", 1)
+        ("creditor", "bob.11111111")
+        ("beneficiary", "alice.111111")
+        ("cpu_staked", "1.0000 EOS")
+        ("net_staked", "1.0000 EOS"),
+        order
+    );
+
+    // after 1 minutes
+    produce_blocks(120);
+
+    creditor = get_creditor("bob.11111111");
+    REQUIRE_MATCHING_OBJECT(mvo()
+        ("is_active", 1)
+        ("for_free", 1)
+        ("free_memo", "hell yeah!")
+        ("account", "bob.11111111")
+        ("balance", "4998.0000 EOS")
+        ("cpu_staked", "0.0000 EOS")
+        ("net_staked", "0.0000 EOS")
+        ("cpu_unstaked", "1.0000 EOS")
+        ("net_unstaked", "1.0000 EOS"),
+        creditor
+    );
+
+    BOOST_REQUIRE_EQUAL(get_balance(N(masktransfer)), asset::from_string("0.1000 EOS"));
+    BOOST_REQUIRE_EQUAL(get_balance(N(stakedincome)), asset::from_string("0.0000 EOS"));
 
 }
 FC_LOG_AND_RETHROW()
+
+
+// BOOST_FIXTURE_TEST_CASE(rotate_creditor_test, bankofstaked_tester)
+// try
+// {
+//     push_action(N(bankofstaked), N(setplan), mvo()
+//         ("price", "0.1000 EOS")
+//         ("cpu", "2495.0000 EOS")
+//         ("net", "2495.0000 EOS")
+//         ("duration", 1)
+//         ("is_free", 1));
+//     push_action(N(bankofstaked), N(setplan), mvo()
+//         ("price", "1.0000 EOS")
+//         ("cpu", "10.0000 EOS")
+//         ("net", "10.0000 EOS")
+//         ("duration", 2)
+//         ("is_free", 0));
+
+//     push_action(N(bankofstaked), N(addcreditor), mvo()("account", "bob.11111111")("for_free", 1)("free_memo", ""));
+//     push_action(N(bankofstaked), N(addcreditor), mvo()("account", "ted.11111111")("for_free", 1)("free_memo", ""));
+//     push_action(N(bankofstaked), N(addcreditor), mvo()("account", "carol.111111")("for_free", 0)("free_memo", ""));
+//     push_action(N(bankofstaked), N(addcreditor), mvo()("account", "carol.222222")("for_free", 0)("free_memo", ""));
+
+//     push_action(N(bankofstaked), N(activateplan), mvo()
+//         ("price", "0.1000 EOS")
+//         ("is_active", 1));
+//     push_action(N(bankofstaked), N(activateplan), mvo()
+//         ("price", "1.0000 EOS")
+//         ("is_active", 1));
+
+//     push_action(N(bankofstaked), N(activate), mvo()("account", "bob.11111111"));
+//     push_action(N(bankofstaked), N(activate), mvo()("account", "carol.111111"));
+//     produce_blocks();
+
+//     eosio_system_tester::transfer(N(alice.111111), N(bankofstaked), core_sym::from_string("0.1000"), N(alice.111111));
+//     produce_blocks(10);
+//     // eosio_system_tester::transfer(N(alice.111111), N(bankofstaked), core_sym::from_string("1.0000"), N(alice.111111));
+//     // produce_blocks();
+
+//     auto creditor = get_creditor("bob.11111111");
+//     REQUIRE_MATCHING_OBJECT(mvo()
+//         ("is_active", 0)
+//         ("for_free", 1)
+//         ("free_memo", "")
+//         ("account", "bob.11111111")
+//         ("balance", "5000.0000 EOS")
+//         ("cpu_staked", "2495.0000 EOS")
+//         ("net_staked", "2495.0000 EOS")
+//         ("cpu_unstaked", "0.0000 EOS")
+//         ("net_unstaked", "0.0000 EOS"),
+//         creditor
+//     );
+
+//     creditor = get_creditor("ted.11111111");
+//     REQUIRE_MATCHING_OBJECT(mvo()
+//         ("is_active", 1)
+//         ("for_free", 1)
+//         ("free_memo", "")
+//         ("account", "ted.11111111")
+//         ("balance", "6000.0000 EOS")
+//         ("cpu_staked", "0.0000 EOS")
+//         ("net_staked", "0.0000 EOS")
+//         ("cpu_unstaked", "0.0000 EOS")
+//         ("net_unstaked", "0.0000 EOS"),
+//         creditor
+//     );
+// }
+// FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()
