@@ -16,6 +16,19 @@ namespace utils
     return to;
   }
 
+  //get income recipient for creditor
+  account_name get_recipient(account_name creditor)
+  {
+    recipient_table i(CODE_ACCOUNT, CODE_ACCOUNT);
+    account_name recipient = creditor;
+    auto itr = i.find(creditor);
+    if(itr != i.end()) {
+        recipient = itr->recipient_account;
+    }
+    eosio_assert( is_account( recipient ), "recipient account does not exist");
+    return recipient;
+  }
+
   //get active creditor from creditor table
   account_name get_active_creditor(uint64_t for_free)
   {
