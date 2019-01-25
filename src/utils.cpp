@@ -19,7 +19,7 @@ namespace utils
   //get income recipient for creditor
   account_name get_recipient(account_name creditor)
   {
-    recipient_table i(CODE_ACCOUNT, SCOPE);
+    recipient_table i(CODE_ACCOUNT, CODE_ACCOUNT);
     account_name recipient = creditor;
     auto itr = i.find(creditor);
     if(itr != i.end()) {
