@@ -1,12 +1,11 @@
-#include <eosiolib/currency.hpp>
 #include <eosiolib/transaction.hpp>
 #include <eosio.token/eosio.token.hpp>
 #include <eosio.system/eosio.system.hpp>
-#include <../include/bankofstaked/bankofstaked.hpp>
-#include <lock.cpp>
-#include <utils.cpp>
-#include <validation.cpp>
-#include <safedelegatebw.cpp>
+#include "../include/bankofstaked/bankofstaked.hpp"
+#include "lock.cpp"
+#include "utils.cpp"
+#include "validation.cpp"
+#include "safedelegatebw.hpp"
 
 using namespace eosio;
 using namespace eosiosystem;
@@ -15,15 +14,13 @@ using namespace lock;
 using namespace utils;
 using namespace validation;
 
-class bankofstaked : contract
+class [[eosio::contract]] bankofstaked : contract
 {
 
 public:
   using contract::contract;
-  bankofstaked(name self) : contract(self) {}
 
-
-  // @abi action clearhistory
+  [[eosio::action]]
   void clearhistory(uint64_t max_depth)
   {
     require_auth(CODE_ACCOUNT);
@@ -43,7 +40,7 @@ public:
   }
 
   // DEBUG only, action to empty entires in both tables
-  // @abi action empty
+  [[eosio::action]]
   void empty()
   {
     require_auth(CODE_ACCOUNT);
@@ -93,41 +90,41 @@ public:
     */
   }
 
-  // @abi action test
-  void test(account_name creditor)
+  [[eosio::action]]
+  void test(name creditor)
   {
     require_auth(CODE_ACCOUNT);
 
     validate_creditor(creditor);
 
-    plan_table p(CODE_ACCOUNT, CODE_ACCOUNT);
-    auto idx = p.get_index<N(price)>();
+    plan_table p(CODE_ACCOUNT, CODE_ACCOUNT.value);
+    auto idx = p.get_index<"price"_n>();
     auto plan = idx.find(FREE_PLAN_AMOUNT);
 
     //INLINE ACTION to test delegate CPU&NET for creditor itself
     if (is_safe_creditor(creditor)) {
       INLINE_ACTION_SENDER(safedelegatebw, delegatebw)
-      (creditor, {{creditor, N(creditorperm)}}, {creditor, plan->net, plan->cpu});
+      (creditor, {{creditor, "creditorperm"_n}}, {creditor, plan->net, plan->cpu});
     } else {
       INLINE_ACTION_SENDER(eosiosystem::system_contract, delegatebw)
-      (EOSIO, {{creditor, N(creditorperm)}}, {creditor, creditor, plan->net, plan->cpu, false});
+      (EOSIO, {{creditor, "creditorperm"_n}}, {creditor, creditor, plan->net, plan->cpu, false});
     }
 
     INLINE_ACTION_SENDER(eosiosystem::system_contract, undelegatebw)
-    (EOSIO, {{creditor, N(creditorperm)}}, {creditor, creditor, plan->net, plan->cpu});
+    (EOSIO, {{creditor, "creditorperm"_n}}, {creditor, creditor, plan->net, plan->cpu});
 
   }
 
-  // @abi action rotate
-  void rotate(account_name creditor, uint64_t for_free)
+  [[eosio::action]]
+  void rotate(name creditor, uint64_t for_free)
   {
     require_auth(CODE_ACCOUNT);
 
     validate_creditor(creditor);
   }
 
-  // @abi action check
-  void check(account_name creditor)
+  [[eosio::action]]
+  void check(name creditor)
   {
     require_auth(CODE_ACCOUNT);
 
@@ -138,7 +135,7 @@ public:
     std::vector<uint64_t> order_ids;
 
     // order ordered by expire_at
-    auto idx = o.get_index<N(expire_at)>();
+    auto idx = o.get_index<"expire.at"_n>();
     auto itr = idx.begin();
     //force expire at most CHECK_MAX_DEPTH orders
     while (itr != idx.end() && depth < CHECK_MAX_DEPTH)
@@ -152,10 +149,10 @@ public:
     undelegate(order_ids, 0);
     expire_freelock();
     rotate_creditor();
-    update_balance(creditor);
+    get_balance(creditor);
   }
 
-  // @abi action forcexpire
+  [[eosio::action]]
   void forcexpire(const std::vector<uint64_t>& order_ids=std::vector<uint64_t>())
   {
     require_auth(CODE_ACCOUNT);
@@ -166,7 +163,7 @@ public:
     rotate_creditor();
   }
 
-  // @abi action expireorder
+  [[eosio::action]]
   void expireorder(uint64_t id)
   {
     require_auth(CODE_ACCOUNT);
@@ -178,9 +175,9 @@ public:
 
     //save order meta to history
     //buyer|creditor|beneficiary|plan_id|price|cpu|net|created_at|expire_at
-    content += (name{order->buyer}).to_string();
-    content += "|" + (name{order->creditor}).to_string();
-    content += "|" + (name{order->beneficiary}).to_string();
+    content += order->buyer.to_string();
+    content += "|" + order->creditor.to_string();
+    content += "|" + order->beneficiary.to_string();
     content += "|" + std::to_string(order->plan_id);
     content += "|" + std::to_string(order->price.amount);
     content += order->is_free==TRUE?"|free":"|paid";
@@ -191,7 +188,7 @@ public:
 
     // updated cpu_staked/net_staked/cpu_unstaked/net_unstaked of creditor entry
     creditor_table c(CODE_ACCOUNT, SCOPE);
-    auto creditor_itr = c.find(order->creditor);
+    auto creditor_itr = c.find(order->creditor.value);
     c.modify(creditor_itr, RAM_PAYER, [&](auto &i) {
       i.cpu_staked -= order->cpu_staked;
       i.net_staked -= order->net_staked;
@@ -213,12 +210,12 @@ public:
     });
   }
 
-  // @abi action addwhitelist
-  void addwhitelist(account_name account, uint64_t capacity)
+  [[eosio::action]]
+  void addwhitelist(name account, uint64_t capacity)
   {
     require_auth(CODE_ACCOUNT);
     whitelist_table w(CODE_ACCOUNT, SCOPE);
-    auto itr = w.find(account);
+    auto itr = w.find(account.value);
     if(itr == w.end()) {
       w.emplace(RAM_PAYER, [&](auto &i) {
         i.account = account;
@@ -234,23 +231,23 @@ public:
     }
   }
 
-  // @abi action delwhitelist
-  void delwhitelist(account_name account, uint64_t capacity)
+  [[eosio::action]]
+  void delwhitelist(name account, uint64_t capacity)
   {
     require_auth(CODE_ACCOUNT);
     whitelist_table w(CODE_ACCOUNT, SCOPE);
-    auto itr = w.find(account);
+    auto itr = w.find(account.value);
     eosio_assert(itr != w.end(), "account not found in whitelist table");
     //delelete whitelist entry
     w.erase(itr);
   }
 
-  // @abi action addcreditor
-  void addcreditor(account_name account, uint64_t for_free, std::string free_memo)
+  [[eosio::action]]
+  void addcreditor(name account, uint64_t for_free, std::string free_memo)
   {
     require_auth(CODE_ACCOUNT);
     creditor_table c(CODE_ACCOUNT, SCOPE);
-    auto itr = c.find(account);
+    auto itr = c.find(account.value);
     eosio_assert(itr == c.end(), "account already exist in creditor table");
 
     c.emplace(RAM_PAYER, [&](auto &i) {
@@ -264,8 +261,8 @@ public:
     });
   }
 
-  // @abi action addsafeacnt
-  void addsafeacnt(account_name account)
+  [[eosio::action]]
+  void addsafeacnt(name account)
   {
     require_auth(CODE_ACCOUNT);
 
@@ -279,25 +276,25 @@ public:
     });
   }
 
-  // @abi action delsafeacnt
-  void delsafeacnt(account_name account)
+  [[eosio::action]]
+  void delsafeacnt(name account)
   {
     require_auth(CODE_ACCOUNT);
     safecreditor_table s(CODE_ACCOUNT, SCOPE);
-    auto itr = s.find(account);
+    auto itr = s.find(account.value);
     eosio_assert(itr != s.end(), "account does not exist in safecreditor table");
     s.erase(itr);
   }
 
-  // @abi action setrecipient
-  void setrecipient(account_name creditor, account_name recipient)
+  [[eosio::action]]
+  void setrecipient(name creditor, name recipient)
   {
     require_auth(CODE_ACCOUNT);
 
     validate_creditor(creditor);
 
-    recipient_table r(CODE_ACCOUNT, CODE_ACCOUNT);
-    auto itr = r.find(creditor);
+    recipient_table r(CODE_ACCOUNT, CODE_ACCOUNT.value);
+    auto itr = r.find(creditor.value);
     if(itr == r.end()) {
         r.emplace(RAM_PAYER, [&](auto &i) {
           i.creditor = creditor;
@@ -314,22 +311,22 @@ public:
   }
 
 
-  // @abi action delrecipient
-  void delrecipient(account_name creditor)
+  [[eosio::action]]
+  void delrecipient(name creditor)
   {
     require_auth(CODE_ACCOUNT);
-    recipient_table r(CODE_ACCOUNT, CODE_ACCOUNT);
-    auto itr = r.find(creditor);
+    recipient_table r(CODE_ACCOUNT, CODE_ACCOUNT.value);
+    auto itr = r.find(creditor.value);
     eosio_assert(itr != r.end(), "recipient entry not found!!!");
     r.erase(itr);
   }
 
-  // @abi action delcreditor
-  void delcreditor(account_name account)
+  [[eosio::action]]
+  void delcreditor(name account)
   {
     require_auth(CODE_ACCOUNT);
     creditor_table c(CODE_ACCOUNT, SCOPE);
-    auto itr = c.find(account);
+    auto itr = c.find(account.value);
     eosio_assert(itr!= c.end(), "account not found in creditor table");
     eosio_assert(itr->is_active == FALSE, "cannot delete active creditor");
     //delelete creditor entry
@@ -337,12 +334,12 @@ public:
   }
 
 
-  // @abi action addblacklist
-  void addblacklist(account_name account)
+  [[eosio::action]]
+  void addblacklist(name account)
   {
     require_auth(CODE_ACCOUNT);
     blacklist_table b(CODE_ACCOUNT, SCOPE);
-    auto itr = b.find(account);
+    auto itr = b.find(account.value);
     eosio_assert(itr == b.end(), "account already exist in blacklist table");
 
     // add entry
@@ -353,29 +350,29 @@ public:
   }
 
 
-  // @abi action delblacklist
-  void delblacklist(account_name account)
+  [[eosio::action]]
+  void delblacklist(name account)
   {
     require_auth(CODE_ACCOUNT);
     blacklist_table b(CODE_ACCOUNT, SCOPE);
 
     //make sure specified blacklist account exists
-    auto itr = b.find(account);
+    auto itr = b.find(account.value);
     eosio_assert(itr!= b.end(), "account not found in blacklist table");
     //delelete entry
     b.erase(itr);
   }
 
 
-  // @abi action activate
-  void activate(account_name account)
+  [[eosio::action]]
+  void activate(name account)
   {
     require_auth(CODE_ACCOUNT);
     activate_creditor(account);
   }
 
 
-  // @abi action setplan
+  [[eosio::action]]
   void setplan(asset price,
                asset cpu,
                asset net,
@@ -384,8 +381,8 @@ public:
   {
     require_auth(CODE_ACCOUNT);
     validate_asset(price, cpu, net);
-    plan_table p(CODE_ACCOUNT, CODE_ACCOUNT);
-    auto idx = p.get_index<N(price)>();
+    plan_table p(CODE_ACCOUNT, CODE_ACCOUNT.value);
+    auto idx = p.get_index<"price"_n>();
     auto itr = idx.find(price.amount);
     if (itr == idx.end())
     {
@@ -413,13 +410,13 @@ public:
     }
   }
   
-  // @abi action activateplan
+  [[eosio::action]]
   void activateplan(asset price, bool is_active)
   {
     require_auth(CODE_ACCOUNT);
     eosio_assert(price.is_valid(), "invalid price");
-    plan_table p(CODE_ACCOUNT, CODE_ACCOUNT);
-    auto idx = p.get_index<N(price)>();
+    plan_table p(CODE_ACCOUNT, CODE_ACCOUNT.value);
+    auto idx = p.get_index<"price"_n>();
     auto itr = idx.find(price.amount);
     eosio_assert(itr != idx.end(), "price not found");
 
@@ -429,149 +426,28 @@ public:
     });
   }
 
-
-  //entry point of bankofstaked contract
-  void apply(account_name contract, account_name action)
-  {
-    if (action == N(transfer) and contract == N(eosio.token))
-    {
-      received_token(unpack_action_data<currency::transfer>());
-      return;
-    }
-
-    if (contract != _self)
-      return;
-
-    auto &thiscontract = *this;
-    switch (action)
-    {
-      EOSIO_API(bankofstaked,
-          (empty)
-          (setplan)
-          (activateplan)
-          (expireorder)
-          (addwhitelist)
-          (delwhitelist)
-          (addcreditor)
-          (addsafeacnt)
-          (delsafeacnt)
-          (delcreditor)
-          (addblacklist)
-          (delblacklist)
-          (activate)
-          (check)
-          (test)
-          (rotate)
-          (clearhistory)
-          (forcexpire)
-          (setrecipient)
-          (delrecipient));
-    };
-  }
-
-private:
-
-  //undelegate Orders specified by order_ids
-  //deferred(if duration > 0) transaction to auto undelegate after expired
-  void undelegate(const std::vector<uint64_t>& order_ids=std::vector<uint64_t>(), uint64_t duration=0)
-  {
-    if(order_ids.size() == 0) 
-    {
-      return;
-    }
-    eosio::transaction out;
-
-    order_table o(CODE_ACCOUNT, SCOPE);
-    plan_table p(CODE_ACCOUNT, CODE_ACCOUNT);
-
-    uint64_t nonce = 0;
-
-    for(int i=0; i<order_ids.size(); i++)
-    {
-      uint64_t order_id = order_ids[i];
-      nonce += order_id;
-      // get order entry
-      auto order = o.get(order_id);
-
-      // undelegatebw action
-      action act1 = action(
-        permission_level{ order.creditor, N(creditorperm) },
-        N(eosio), N(undelegatebw),
-        std::make_tuple(order.creditor, order.beneficiary, order.net_staked, order.cpu_staked)
-      );
-      out.actions.emplace_back(act1);
-      //delete order entry
-      action act2 = action(
-        permission_level{ CODE_ACCOUNT, N(bankperm) },
-        CODE_ACCOUNT, N(expireorder),
-        std::make_tuple(order_id)
-      );
-      out.actions.emplace_back(act2);
-
-      //if order is_free is not free, transfer income to creditor
-      if (order.is_free == FALSE)
-      {
-        auto plan = p.get(order.plan_id);
-
-        auto username = name{get_recipient(order.creditor)};
-        std::string recipient_name = username.to_string();
-        std::string memo = recipient_name + " bankofstaked income";
-
-        // transfer income to creditor
-        asset income = get_income(order.creditor, order.price);
-        eosio_assert(income <= order.price, "income should not be greater than price");
-        action act3 = action(
-          permission_level{ CODE_ACCOUNT, N(bankperm) },
-          N(eosio.token), N(transfer),
-          std::make_tuple(CODE_ACCOUNT, MASK_TRANSFER, income, memo)
-        );
-        out.actions.emplace_back(act3);
-
-        // transfer reserved fund to STAKED_INCOME
-        asset reserved = order.price - income;
-        eosio_assert(reserved <= order.price, "reserved should not be greater than price");
-        username = name{STAKED_INCOME};
-        recipient_name = username.to_string();
-        memo = recipient_name + " bankofstaked reserved";
-        action act4 = action(
-          permission_level{ CODE_ACCOUNT, N(bankperm) },
-          N(eosio.token), N(transfer),
-          std::make_tuple(CODE_ACCOUNT, MASK_TRANSFER, reserved, memo)
-        );
-        out.actions.emplace_back(act4);
-
-      }
-    }
-
-    if(duration > 0) {
-      out.delay_sec = duration * SECONDS_PER_MIN;
-    }
-    out.send((uint128_t(CODE_ACCOUNT) << 64) | current_time() | nonce, CODE_ACCOUNT, true);
-  }
-
   //token received
-  void received_token(const currency::transfer &t)
+  void received_token(name from, name to, asset quantity, string memo)
   {
     //validation token transfer, only accept EOS transfer
-    //eosio_assert(t.quantity.symbol==symbol_type(system_token_symbol), "only accept EOS transfer");
-    eosio_assert(t.quantity.symbol==EOS_SYMBOL, "only accept EOS transfer");
+    eosio_assert(quantity.symbol == EOS_SYMBOL, "only accept EOS transfer");
 
-    if (t.to == _self)
+    if (to == _self)
     {
-      account_name buyer = t.from;
+      name buyer = from;
       //if token comes from fundstostake, do nothing, just take it :)
-      if (t.from == N(fundstostake))
+      if (from == "fundstostake"_n)
       {
         return;
       }
       //validate plan, is_active should be TRUE
-      plan_table p(CODE_ACCOUNT, CODE_ACCOUNT);
-      auto idx = p.get_index<N(price)>();
-      auto plan = idx.find(t.quantity.amount);
+      plan_table p(CODE_ACCOUNT, CODE_ACCOUNT.value);
+      auto idx = p.get_index<"price"_n>();
+      auto plan = idx.find(quantity.amount);
       eosio_assert(plan->is_active == TRUE, "plan is in-active");
       eosio_assert(plan != idx.end(), "invalid price");
 
-      account_name beneficiary = get_beneficiary(t.memo, buyer);
+      name beneficiary = get_beneficiary(memo, buyer);
 
       // if plan is free, validate there is no Freelock for this beneficiary
       if(plan->is_free == TRUE)
@@ -580,7 +456,7 @@ private:
       }
 
       //get active creditor
-      account_name creditor = get_active_creditor(plan->is_free);
+      name creditor = get_active_creditor(plan->is_free);
 
       //if plan is not free, make sure creditor has enough balance to delegate
       if(plan->is_free == FALSE)
@@ -609,19 +485,19 @@ private:
       //INLINE ACTION to delegate CPU&NET for beneficiary account
       if (is_safe_creditor(creditor)) {
         INLINE_ACTION_SENDER(safedelegatebw, delegatebw)
-        (creditor, {{creditor, N(creditorperm)}}, {beneficiary, plan->net, plan->cpu});
+        (creditor, {{creditor, "creditorperm"_n}}, {beneficiary, plan->net, plan->cpu});
       } else {
         INLINE_ACTION_SENDER(eosiosystem::system_contract, delegatebw)
-        (EOSIO, {{creditor, N(creditorperm)}}, {creditor, beneficiary, plan->net, plan->cpu, false});
+        (EOSIO, {{creditor, "creditorperm"_n}}, {creditor, beneficiary, plan->net, plan->cpu, false});
       }
 
       //INLINE ACTION to call check action of `bankofstaked`
       INLINE_ACTION_SENDER(bankofstaked, check)
-      (CODE_ACCOUNT, {{CODE_ACCOUNT, N(bankperm)}}, {creditor});
+      (CODE_ACCOUNT, {{CODE_ACCOUNT, "bankperm"_n}}, {creditor});
 
       // add cpu_staked&net_staked to creditor entry
       creditor_table c(CODE_ACCOUNT, SCOPE);
-      auto creditor_itr = c.find(creditor);
+      auto creditor_itr = c.find(creditor.value);
       c.modify(creditor_itr, RAM_PAYER, [&](auto &i) {
         i.cpu_staked += plan->cpu;
         i.net_staked += plan->net;
@@ -655,12 +531,11 @@ private:
         // auto refund immediately
         //INLINE ACTION to auto refund
         creditor_table c(CODE_ACCOUNT, SCOPE);
-        std::string free_memo = c.get(creditor).free_memo;
-        auto username = name{buyer};
-        std::string buyer_name = username.to_string();
+        std::string free_memo = c.get(creditor.value).free_memo;
+        std::string buyer_name = buyer.to_string();
         std::string memo = buyer_name + " " + free_memo;
         INLINE_ACTION_SENDER(eosio::token, transfer)
-        (N(eosio.token), {{CODE_ACCOUNT, N(bankperm)}}, {CODE_ACCOUNT, MASK_TRANSFER, plan->price, memo});
+        ("eosio.token"_n, {{CODE_ACCOUNT, "bankperm"_n}}, {CODE_ACCOUNT, MASK_TRANSFER, plan->price, memo});
       }
 
       //deferred transaction to auto undelegate after expired
@@ -669,13 +544,121 @@ private:
       undelegate(order_ids, plan->duration);
     }
   }
+
+private:
+
+  //undelegate Orders specified by order_ids
+  //deferred(if duration > 0) transaction to auto undelegate after expired
+  void undelegate(const std::vector<uint64_t>& order_ids=std::vector<uint64_t>(), uint64_t duration=0)
+  {
+    if(order_ids.size() == 0) 
+    {
+      return;
+    }
+    eosio::transaction out;
+
+    order_table o(CODE_ACCOUNT, SCOPE);
+    plan_table p(CODE_ACCOUNT, CODE_ACCOUNT.value);
+
+    uint64_t nonce = 0;
+
+    for(int i=0; i<order_ids.size(); i++)
+    {
+      uint64_t order_id = order_ids[i];
+      nonce += order_id;
+      // get order entry
+      auto order = o.get(order_id);
+
+      // undelegatebw action
+      action act1 = action(
+        permission_level{ order.creditor, "creditorperm"_n },
+        "eosio"_n, "undelegatebw"_n,
+        std::make_tuple(order.creditor, order.beneficiary, order.net_staked, order.cpu_staked)
+      );
+      out.actions.emplace_back(act1);
+      //delete order entry
+      action act2 = action(
+        permission_level{ CODE_ACCOUNT, "bankperm"_n },
+        CODE_ACCOUNT, "expireorder"_n,
+        std::make_tuple(order_id)
+      );
+      out.actions.emplace_back(act2);
+
+      //if order is_free is not free, transfer income to creditor
+      if (order.is_free == FALSE)
+      {
+        auto plan = p.get(order.plan_id);
+
+        auto username = get_recipient(order.creditor);
+        std::string recipient_name = username.to_string();
+        std::string memo = recipient_name + " bankofstaked income";
+
+        // transfer income to creditor
+        asset income = get_income(order.creditor, order.price);
+        eosio_assert(income <= order.price, "income should not be greater than price");
+        action act3 = action(
+          permission_level{ CODE_ACCOUNT, "bankperm"_n },
+          "eosio.token"_n, "transfer"_n,
+          std::make_tuple(CODE_ACCOUNT, MASK_TRANSFER, income, memo)
+        );
+        out.actions.emplace_back(act3);
+
+        // transfer reserved fund to reserved_account
+        asset reserved = order.price - income;
+        eosio_assert(reserved <= order.price, "reserved should not be greater than price");
+        recipient_name = STAKED_INCOME.to_string();
+        memo = recipient_name + " bankofstaked reserved";
+        action act4 = action(
+          permission_level{ CODE_ACCOUNT, "bankperm"_n },
+          "eosio.token"_n, "transfer"_n,
+          std::make_tuple(CODE_ACCOUNT, MASK_TRANSFER, reserved, memo)
+        );
+        out.actions.emplace_back(act4);
+
+      }
+    }
+
+    if(duration > 0) {
+      out.delay_sec = duration * SECONDS_PER_MIN;
+    }
+    out.send((uint128_t(CODE_ACCOUNT.value) << 64) | current_time() | nonce, CODE_ACCOUNT, true);
+  }
+
 };
 
-extern "C"
-{
-  [[noreturn]] void apply(uint64_t receiver, uint64_t code, uint64_t action) {
-    bankofstaked c(receiver);
-    c.apply(code, action);
-    eosio_exit(0);
+extern "C" {
+  void apply(uint64_t receiver, uint64_t code, uint64_t action) {
+    if (code == "eosio.token"_n.value && action == "transfer"_n.value) {
+      eosio::execute_action(
+        name(receiver), name(code), &bankofstaked::received_token
+      );
+    }
+
+    if (code == receiver) {
+      switch (action) {
+        EOSIO_DISPATCH_HELPER(bankofstaked,
+          (clearhistory)
+          (empty)
+          (test)
+          (rotate)
+          (check)
+          (forcexpire)
+          (expireorder)
+          (addwhitelist)
+          (delwhitelist)
+          (addcreditor)
+          (addsafeacnt)
+          (delsafeacnt)
+          (delcreditor)
+          (addblacklist)
+          (delblacklist)
+          (setplan)
+          (activate)
+          (activateplan)
+          (setrecipient)
+          (delrecipient)
+        )
+      }
+    }
   }
 }

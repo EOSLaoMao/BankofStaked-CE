@@ -1,0 +1,1 @@
+docker cp ../faketransfer nodeosd:/

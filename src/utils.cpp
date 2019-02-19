@@ -5,23 +5,23 @@ using namespace bank;
 namespace utils
 {
   //try to get beneficiary from memo, otherwise, use sender.
-  account_name get_beneficiary(const std::string &memo, account_name sender)
+  name get_beneficiary(const std::string &memo, name sender)
   {
-    account_name to = sender;
+    name to = sender;
     if (memo.length() > 0)
     {
-      to = string_to_name(memo.c_str());
+      to = name(memo.c_str());
       eosio_assert( is_account( to ), "to account does not exist");
     }
     return to;
   }
 
   //get income recipient for creditor
-  account_name get_recipient(account_name creditor)
+  name get_recipient(name creditor)
   {
-    recipient_table i(CODE_ACCOUNT, CODE_ACCOUNT);
-    account_name recipient = creditor;
-    auto itr = i.find(creditor);
+    recipient_table i(CODE_ACCOUNT, CODE_ACCOUNT.value);
+    name recipient = creditor;
+    auto itr = i.find(creditor.value);
     if(itr != i.end()) {
         recipient = itr->recipient_account;
     }
@@ -30,13 +30,13 @@ namespace utils
   }
 
   //get active creditor from creditor table
-  account_name get_active_creditor(uint64_t for_free)
+  name get_active_creditor(uint64_t for_free)
   {
     uint64_t active = TRUE;
     creditor_table c(CODE_ACCOUNT, SCOPE);
-    auto idx = c.get_index<N(is_active)>();
+    auto idx = c.get_index<"is.active"_n>();
     auto itr = idx.begin();
-    account_name creditor;
+    name creditor;
     while (itr != idx.end())
     {
       if(itr->is_active != TRUE)
@@ -55,21 +55,19 @@ namespace utils
   }
 
   //get account EOS balance
-  asset get_balance(account_name owner)
+  asset get_balance(name owner)
   {
-    auto symbol = symbol_type(system_token_symbol);
-    eosio::token t(N(eosio.token));
-    auto balance = t.get_balance(owner, symbol.name());
+    auto balance = eosio::token::get_balance("eosio.token"_n, owner, EOS_SYMBOL.code());
     return balance;
   }
 
   //get account EOS balance
-  asset update_balance(account_name owner)
+  asset update_balance(name owner)
   {
     auto balance = get_balance(owner);
     // update creditor if update is true
     creditor_table c(CODE_ACCOUNT, SCOPE);
-    auto creditor_itr = c.find(owner);
+    auto creditor_itr = c.find(owner.value);
     if(creditor_itr != c.end() && creditor_itr->balance != balance) {
       c.modify(creditor_itr, RAM_PAYER, [&](auto &i) {
         i.balance = balance;
@@ -79,16 +77,14 @@ namespace utils
     return balance;
   }
 
-
-
   //get creditor with balance >= to_delegate
-  account_name get_qualified_paid_creditor(asset to_delegate)
+  name get_qualified_paid_creditor(asset to_delegate)
   {
     uint64_t active = TRUE;
     creditor_table c(CODE_ACCOUNT, SCOPE);
-    auto idx = c.get_index<N(is_active)>();
+    auto idx = c.get_index<"is.active"_n>();
     auto itr = idx.begin();
-    account_name creditor;
+    name creditor;
     while (itr != idx.end())
     {
       asset balance = get_balance(itr->account);
@@ -102,11 +98,11 @@ namespace utils
   }
 
   //get creditor income
-  asset get_income(account_name creditor, asset price)
+  asset get_income(name creditor, asset price)
   {
-    dividend_table c(CODE_ACCOUNT, CODE_ACCOUNT);
+    dividend_table c(CODE_ACCOUNT, CODE_ACCOUNT.value);
     uint64_t amount = price.amount;
-    auto itr = c.find(creditor);
+    auto itr = c.find(creditor.value);
     if(itr != c.end()) {
         price.amount = amount * itr->percentage / 100;
     } else {
@@ -115,11 +111,11 @@ namespace utils
     return price;
   }
 
-  void activate_creditor(account_name account)
+  void activate_creditor(name account)
   {
     creditor_table c(CODE_ACCOUNT, SCOPE);
 
-    auto creditor = c.find(account);
+    auto creditor = c.find(account.value);
     //make sure specified creditor exists
     eosio_assert(creditor != c.end(), "account not found in creditor table");
 
@@ -140,9 +136,9 @@ namespace utils
           i.updated_at = now();
         });
         action act1 = action(
-          permission_level{ CODE_ACCOUNT, N(bankperm) },
+          permission_level{ CODE_ACCOUNT, "bankperm"_n },
           CODE_ACCOUNT,
-          N(rotate),
+          "rotate"_n,
           std::make_tuple(itr->account, itr->for_free)
         );
         out.actions.emplace_back(act1);
@@ -157,7 +153,7 @@ namespace utils
         });
       }
     }
-    out.send((uint128_t(CODE_ACCOUNT) << 64) | current_time(), CODE_ACCOUNT, true);
+    out.send((uint128_t(CODE_ACCOUNT.value) << 64) | current_time(), CODE_ACCOUNT, true);
   }
 
   //get min paid creditor balance
@@ -165,7 +161,7 @@ namespace utils
   {
 
     uint64_t balance = 10000 * 10000; // 10000 EOS
-    plan_table p(CODE_ACCOUNT, CODE_ACCOUNT);
+    plan_table p(CODE_ACCOUNT, CODE_ACCOUNT.value);
     eosio_assert(p.begin() != p.end(), "plan table is empty!");
     auto itr = p.begin();
     while (itr != p.end())
@@ -180,10 +176,10 @@ namespace utils
   }
 
   //check creditor enabled safedelegate or not
-  bool is_safe_creditor(account_name creditor)
+  bool is_safe_creditor(name creditor)
   {
     safecreditor_table s(CODE_ACCOUNT, SCOPE);
-    auto itr = s.find(creditor);
+    auto itr = s.find(creditor.value);
     if(itr == s.end()){
       return false;
     } else {
@@ -203,7 +199,7 @@ namespace utils
     uint64_t min_paid_creditor_balance = get_min_paid_creditor_balance();
     auto free_rotated = free_balance.amount > MIN_FREE_CREDITOR_BALANCE ?TRUE:FALSE;
     auto paid_rotated = paid_balance.amount > min_paid_creditor_balance ?TRUE:FALSE;
-    auto idx = c.get_index<N(updated_at)>();
+    auto idx = c.get_index<"updated.at"_n>();
     auto itr = idx.begin();
     while (itr != idx.end())
     {
