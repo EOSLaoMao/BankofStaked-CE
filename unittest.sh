@@ -1,7 +1,7 @@
 #!/bin/bash
 RED='\033[01;31m'
 
-cd tests
+cd /bankofstaked/tests
 ./clean-build.sh
 
 ./build.sh

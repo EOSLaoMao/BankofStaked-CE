@@ -34,4 +34,4 @@ docker cp ./build/$NAME.wasm nodeosd:/$NAME/
 docker cp scripts nodeosd:/
 
 #run unit test
-./unittest.sh
+docker exec $NAME-eos-dev /bankofstaked/unittest.sh
