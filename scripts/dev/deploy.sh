@@ -26,6 +26,8 @@ sleep 1
 sleep 1
 ./scripts/bank_perm.sh bankofstaked EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV
 sleep 1
+./scripts/order_perm.sh bankofstaked EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV
+sleep 1
 cleos -u $API push action bankofstaked addcreditor '{"account": "voter1", "for_free": 1, "free_memo": "A gift from EOSLaoMao team"}' -p bankofstaked
 sleep 1
 cleos -u $API push action bankofstaked addcreditor '{"account": "voter2", "for_free": 0, "free_memo": ""}' -p bankofstaked
