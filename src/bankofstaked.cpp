@@ -432,7 +432,13 @@ public:
     require_auth(CODE_ACCOUNT);
     bool is_free = false;
 
-    //validate plan, is_active should be TRUE
+    // limit max quantity and resources
+    eosio_assert(quantity <= asset{4000000, EOS_SYMBOL}, "quantity exceeds limit");
+    eosio_assert(cpu <= asset{1980000000, EOS_SYMBOL}, "cpu exceeds limit");
+    eosio_assert(net <= asset{20000000, EOS_SYMBOL}, "net exceeds limit");
+    eosio_assert(duration >= 10080, "duration less than limit");
+
+    // make sure beneficiary is a valid account
     eosio_assert( is_account( beneficiary ), "to account does not exist");
 
     //get active creditor
