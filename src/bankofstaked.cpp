@@ -311,6 +311,46 @@ public:
   }
 
 
+ [[eosio::action]] void delorders(const std::vector<uint64_t> &order_ids = std::vector<uint64_t>()) 
+ {
+    require_auth(CODE_ACCOUNT);
+    if (order_ids.size() == 0)
+    {
+      return;
+    }
+
+    order_table o(CODE_ACCOUNT, SCOPE);
+
+    for (int i = 0; i < order_ids.size(); i++)
+    {
+      std::string content = "";
+      uint64_t order_id = order_ids[i];
+      auto order = o.find(order_id);
+      eosio_assert(order != o.end(), "order entry not found!!!");
+      content += order->buyer.to_string();
+      content += "|" + order->creditor.to_string();
+      content += "|" + order->beneficiary.to_string();
+      content += "|" + std::to_string(order->plan_id);
+      content += "|" + std::to_string(order->price.amount);
+      content += order->is_free == TRUE ? "|free" : "|paid";
+      content += "|" + std::to_string(order->cpu_staked.amount);
+      content += "|" + std::to_string(order->net_staked.amount);
+      content += "|" + std::to_string(order->created_at);
+      content += "|" + std::to_string(order->expire_at);
+
+      // save order mete data to history table
+      history_table h(CODE_ACCOUNT, SCOPE);
+      h.emplace(RAM_PAYER, [&](auto &i) {
+        i.id = h.available_primary_key();
+        i.content = content;
+        i.created_at = now();
+      });
+
+      o.erase(order);
+    }
+  }
+
+
   [[eosio::action]]
   void delrecipient(name creditor)
   {
@@ -729,6 +769,7 @@ extern "C" {
           (addsafeacnt)
           (delsafeacnt)
           (delcreditor)
+          (delorders)
           (addblacklist)
           (delblacklist)
           (setplan)
