@@ -661,42 +661,32 @@ private:
   //deferred(if duration > 0) transaction to auto undelegate after expired
   void undelegate(const std::vector<uint64_t>& order_ids=std::vector<uint64_t>(), uint64_t duration=0)
   {
-    if(order_ids.size() == 0) 
-    {
+    if(order_ids.size() == 0) {
       return;
     }
-    eosio::transaction out;
 
     order_table o(CODE_ACCOUNT, SCOPE);
     plan_table p(CODE_ACCOUNT, CODE_ACCOUNT.value);
 
     uint64_t nonce = 0;
 
-    for(int i=0; i<order_ids.size(); i++)
-    {
+    for(int i=0; i<order_ids.size(); i++) {
       uint64_t order_id = order_ids[i];
       nonce += order_id;
       // get order entry
       auto order = o.get(order_id);
 
-      // undelegatebw action
-      action act1 = action(
-        permission_level{ order.creditor, "creditorperm"_n },
-        "eosio"_n, "undelegatebw"_n,
-        std::make_tuple(order.creditor, order.beneficiary, order.net_staked, order.cpu_staked)
-      );
-      out.actions.emplace_back(act1);
-      //delete order entry
-      action act2 = action(
-        permission_level{ CODE_ACCOUNT, "bankperm"_n },
-        CODE_ACCOUNT, "expireorder"_n,
-        std::make_tuple(order_id)
-      );
-      out.actions.emplace_back(act2);
+      // undelegatebw inline action
+      INLINE_ACTION_SENDER(eosiosystem::system_contract, undelegatebw)
+      (EOSIO, {{order.creditor, "creditorperm"_n}}, {order.creditor, order.beneficiary, order.net_staked, order.cpu_staked});
+
+      //delete order inline action
+
+      INLINE_ACTION_SENDER(bankofstaked, expireorder)
+      (CODE_ACCOUNT, {{CODE_ACCOUNT, "bankperm"_n}}, {order.id});
 
       //if order is_free is not free, transfer income to creditor
-      if (order.is_free == FALSE)
-      {
+      if (order.is_free == FALSE) {
         auto username = get_recipient(order.creditor);
         std::string recipient_name = username.to_string();
         std::string memo = recipient_name + " bankofstaked income";
@@ -704,32 +694,18 @@ private:
         // transfer income to creditor
         asset income = get_income(order.creditor, order.price);
         eosio_assert(income <= order.price, "income should not be greater than price");
-        action act3 = action(
-          permission_level{ CODE_ACCOUNT, "bankperm"_n },
-          "eosio.token"_n, "transfer"_n,
-          std::make_tuple(CODE_ACCOUNT, MASK_TRANSFER, income, memo)
-        );
-        out.actions.emplace_back(act3);
+        INLINE_ACTION_SENDER(eosiosystem::token_contract, transfer)
+        (EOSIO_TOKEN, {{CODE_ACCOUNT, "creditorperm"_n}}, {CODE_ACCOUNT, MASK_TRANSFER, income, memo});
 
         // transfer reserved fund to reserved_account
         asset reserved = order.price - income;
         eosio_assert(reserved <= order.price, "reserved should not be greater than price");
         recipient_name = STAKED_INCOME.to_string();
         memo = recipient_name + " bankofstaked reserved";
-        action act4 = action(
-          permission_level{ CODE_ACCOUNT, "bankperm"_n },
-          "eosio.token"_n, "transfer"_n,
-          std::make_tuple(CODE_ACCOUNT, MASK_TRANSFER, reserved, memo)
-        );
-        out.actions.emplace_back(act4);
 
+        INLINE_ACTION_SENDER(eosiosystem::token_contract, transfer)
+        (EOSIO_TOKEN, {{CODE_ACCOUNT, "bankperm"_n}}, {CODE_ACCOUNT, MASK_TRANSFER, reserved, memo});
       }
-    }
-
-    if(duration > 0) {
-      out.delay_sec = duration * SECONDS_PER_MIN;
-    }
-    out.send((uint128_t(CODE_ACCOUNT.value) << 64) | current_time() | nonce, CODE_ACCOUNT, true);
   }
 
 };
