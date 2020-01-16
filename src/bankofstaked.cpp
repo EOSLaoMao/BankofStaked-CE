@@ -336,6 +336,15 @@ public:
     c.erase(itr);
   }
 
+  [[eosio::action]]
+  void undelegatebw(name creditor, name beneficiary, asset net, asset net)
+  {
+    require_auth(CODE_ACCOUNT);
+    // force undelegatebw, used to debug or fix data integrity issue
+    INLINE_ACTION_SENDER(eosiosystem::system_contract, undelegatebw)
+    (EOSIO, {{creditor, "creditorperm"_n}}, {creditor, beneficiary, net, cpu});
+  }
+
 
   [[eosio::action]]
   void addblacklist(name account)
@@ -806,6 +815,7 @@ extern "C" {
           (setrecipient)
           (delrecipient)
           (customorder)
+          (undelegatebw)
         )
       }
     }
