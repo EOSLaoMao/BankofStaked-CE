@@ -619,7 +619,7 @@ public:
         std::string buyer_name = buyer.to_string();
         std::string memo = buyer_name + " " + free_memo;
         INLINE_ACTION_SENDER(eosio::token, transfer)
-        ("eosio.token"_n, {{CODE_ACCOUNT, "bankperm"_n}}, {CODE_ACCOUNT, MASK_TRANSFER, plan->price, memo});
+        (EOSIO_TOKEN, {{CODE_ACCOUNT, "bankperm"_n}}, {CODE_ACCOUNT, MASK_TRANSFER, plan->price, memo});
       }
 
       //deferred transaction to auto undelegate after expired
@@ -694,7 +694,7 @@ private:
         // transfer income to creditor
         asset income = get_income(order.creditor, order.price);
         eosio_assert(income <= order.price, "income should not be greater than price");
-        INLINE_ACTION_SENDER(eosiosystem::token_contract, transfer)
+        INLINE_ACTION_SENDER(eosio::token, transfer)
         (EOSIO_TOKEN, {{CODE_ACCOUNT, "creditorperm"_n}}, {CODE_ACCOUNT, MASK_TRANSFER, income, memo});
 
         // transfer reserved fund to reserved_account
@@ -703,9 +703,10 @@ private:
         recipient_name = STAKED_INCOME.to_string();
         memo = recipient_name + " bankofstaked reserved";
 
-        INLINE_ACTION_SENDER(eosiosystem::token_contract, transfer)
+        INLINE_ACTION_SENDER(eosio::token, transfer)
         (EOSIO_TOKEN, {{CODE_ACCOUNT, "bankperm"_n}}, {CODE_ACCOUNT, MASK_TRANSFER, reserved, memo});
       }
+    }
   }
 
 };
