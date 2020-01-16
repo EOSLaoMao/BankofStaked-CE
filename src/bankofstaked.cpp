@@ -658,7 +658,10 @@ private:
   }
 
   //undelegate Orders specified by order_ids
-  //deferred(if duration > 0) transaction to auto undelegate after expired
+  //(if duration > 0)
+  //deferred transaction to auto undelegate after expired
+  //(if duration == 0)
+  //inline transaction to undelegate immediately
   void undelegate(const std::vector<uint64_t>& order_ids=std::vector<uint64_t>(), uint64_t duration=0)
   {
     if(order_ids.size() == 0) {
