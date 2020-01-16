@@ -337,7 +337,7 @@ public:
   }
 
   [[eosio::action]]
-  void undelegatebw(name creditor, name beneficiary, asset net, asset net)
+  void undelegatebw(name creditor, name beneficiary, asset net, asset cpu)
   {
     require_auth(CODE_ACCOUNT);
     // force undelegatebw, used to debug or fix data integrity issue
