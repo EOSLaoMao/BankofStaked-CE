@@ -756,7 +756,7 @@ private:
           asset income = get_income(order.creditor, order.price);
           eosio_assert(income <= order.price, "income should not be greater than price");
           INLINE_ACTION_SENDER(eosio::token, transfer)
-          (EOSIO_TOKEN, {{CODE_ACCOUNT, "creditorperm"_n}}, {CODE_ACCOUNT, MASK_TRANSFER, income, memo});
+          (EOSIO_TOKEN, {{CODE_ACCOUNT, "bankperm"_n}}, {CODE_ACCOUNT, MASK_TRANSFER, income, memo});
 
           // transfer reserved fund to reserved_account
           asset reserved = order.price - income;
