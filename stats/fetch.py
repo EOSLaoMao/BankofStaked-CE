@@ -2,7 +2,7 @@ import pprint
 import time
 from eosapi import Client
 
-c = Client(nodes=['https://geo.eosasia.one'])
+c = Client(nodes=['https://api.eoslaomao.com'])
 
 def check_order(lower_bound=1):
     expired_orders = []
@@ -90,6 +90,7 @@ if __name__ == "__main__":
         expired.extend(expired_orders)
 
     expired.sort(key=get_name)
+    e_ids = set()
     paid_ids = set()
     ids = set()
     for e in expired:
@@ -99,12 +100,15 @@ if __name__ == "__main__":
             ids.add(" ".join([e["creditor"], str(e["id"])]))
         else:
             paid_ids.add(" ".join([e["creditor"], str(e["id"])]))
+            e_ids.add(e["id"])
     ids = list(ids)
     paid_ids = list(paid_ids)
     ids.sort()
     paid_ids.sort()
     print("total expired ids:", len(ids), ids)
     print("paid expired ids:", len(paid_ids), paid_ids)
+    for i in e_ids:
+        print(i)
     f1 = open("expired_order_ids.txt", "w")
     f1.write("\n".join([str(i) for i in ids]))
     f2 = open("expired_paid_order_ids.txt", "w")

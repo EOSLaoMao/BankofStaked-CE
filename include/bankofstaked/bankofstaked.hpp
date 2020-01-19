@@ -16,6 +16,7 @@ static const name RAM_PAYER = "bankofstaked"_n;
 static const name MASK_TRANSFER = "masktransfer"_n;
 static const name STAKED_INCOME = "stakedincome"_n;
 static const name EOSIO = "eosio"_n;
+static const name EOSIO_TOKEN = "eosio.token"_n;
 static const uint64_t FREE_PLAN_AMOUNT = 1000;
 static const uint64_t SECONDS_PER_MIN = 60;
 static const uint64_t SECONDS_PER_DAY = 24 * 3600;
