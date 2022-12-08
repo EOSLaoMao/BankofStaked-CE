@@ -1,5 +1,5 @@
 beautifulsoup4==4.7.1
-certifi==2018.10.15
+certifi==2022.12.7
 chardet==3.0.4
 eosapi==0.4
 funcy==1.11
